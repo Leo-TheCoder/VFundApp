@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <EditText
+        android:id="@+id/edit_loginEmailPhone"
+        android:layout_width="320dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/custom_edit_text"
+        android:hint="Email hoặc số điện thoại"
+        android:textColorHint="#99045D56"
+        android:layout_margin="4dp"/>
+    <EditText
+        android:id="@+id/edit_loginPassword"
+        android:layout_width="320dp"
+        android:layout_height="44dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/custom_edit_text"
+        android:hint="Mật khẩu"
+        android:textColorHint="#99045D56"
+        android:layout_margin="4dp"/>
+
+    <Button
+        android:id="@+id/btnConfirmLogin"
+        android:layout_width="330dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/custom_button_login_register"
+        android:text="Đăng nhập"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="20dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="17dp">
+        <Button
+            android:id="@+id/btnFacebookLogin"
+            android:layout_width="160dp"
+            android:layout_height="36dp"
+            android:background="@drawable/facebook_button"
+            android:layout_marginRight="4dp"/>
+        <Button
+            android:id="@+id/btnGoogleLogin"
+            android:layout_width="160dp"
+            android:layout_height="36dp"
+            android:background="@drawable/google_button"
+            android:layout_marginLeft="4dp"/>
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="30dp">
+        <TextView
+            android:id="@+id/txtRegisterFromLogin"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Đăng ký tài khoản"
+            android:textColor="#D2FBDB"
+            android:textSize="16sp"/>
+        <TextView
+            android:id="@+id/txtForgetPassword"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Quên mật khẩu?"
+            android:textColor="#D2FBDB"
+            android:textSize="16sp"/>
+    </LinearLayout>
+</LinearLayout>
