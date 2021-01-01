@@ -7,8 +7,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="ButtonRadius" parent="TextAppearance.AppCompat.Widget.Button">
-
+    <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
+        <item name="tabIndicatorColor">#D2FBDB</item>
     </style>
 
+    <style name="MyCustomTabTextAppearance" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@android:color/white</item>
+
+    </style>
 </resources>
