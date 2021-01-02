@@ -1,28 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="12dp">
-        <ImageView
-            android:id="@+id/imgAvatarIcon"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardViewAvatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="12dp"
+            app:cardCornerRadius="40dp"
+            android:layout_centerHorizontal="true"
+            android:innerRadius="0dp"
+            android:shape="ring"
+            android:thicknessRatio="1.9"
             android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/custom_avatar_icon"
-            android:src="@drawable/logo_x2"/>
+            android:layout_marginRight="10dp">
+            <ImageView
+                android:id="@+id/imgAvatarIcon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_centerVertical="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/test_avatar"/>
+        </androidx.cardview.widget.CardView>
+
         <TextView
             android:id="@+id/txtNameOwner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Võ Minh Lâm"
+            android:text="Em Gái Mưa"
             android:textColor="@android:color/white"
             android:textSize="16sp"
-            android:layout_toRightOf="@id/imgAvatarIcon"/>
+            android:layout_toRightOf="@id/cardViewAvatar"/>
         <TextView
             android:id="@+id/txtCountryOwner"
             android:layout_width="wrap_content"
@@ -30,7 +44,7 @@
             android:text="Việt Nam"
             android:textSize="13dp"
             android:textColor="#818C99"
-            android:layout_toRightOf="@id/imgAvatarIcon"
+            android:layout_toRightOf="@id/cardViewAvatar"
             android:layout_below="@id/txtNameOwner"/>
         <Button
             android:id="@+id/btnFollowEvent"
