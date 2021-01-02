@@ -4,7 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.vfund.R;
@@ -17,6 +22,13 @@ public class HomeActivity extends AppCompatActivity {
 
     ViewPager2 viewPager;
     TextView txtAddEvent;
+    private TextView txtCustomTab;
+    private ImageView imgCustomTab;
+    int[] customImagesTab = {R.drawable.home_icon, R.drawable.follow_icon,
+            R.drawable.explore_icon, R.drawable.notify_icon, R.drawable.account_icon};
+    String[] customTextTab = {"Trang chủ", "Theo dõi", "Khám phá", "Thông báo", "Tài khoản"};
+    int[] customImagesTabSelected = {R.drawable.home_icon_selected, R.drawable.follow_icon_selected,
+            R.drawable.explore_icon_selected, R.drawable.notify_icon_selected, R.drawable.account_icon_selected};
 
     private HomeViewPagerAdapter homeViewPagerAdapter;
     private int numOfTab = 5;
@@ -45,75 +57,40 @@ public class HomeActivity extends AppCompatActivity {
         new TabLayoutMediator(tabLayout, viewPager, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
-                switch (position){
-                    case 0:
-                        tab.setText("Trang chủ");
-                        tab.setIcon(R.drawable.ic_outline_home_24);
-                        break;
-                    case 1:
-                        tab.setText("Theo dõi");
-
-                        if(tab.isSelected()){
-                            tab.setIcon(R.drawable.follow_icon_selected);
-                        }
-                        else {
-                            tab.setIcon(R.drawable.follow_icon);
-                        }
-                        break;
-                    case 2:
-                        tab.setText("Khám phá");
-                        if(tab.isSelected()){
-                            tab.setIcon(R.drawable.explore_icon_selected);
-                        }
-                        else {
-
-                        }
-                        break;
-                    case 3:
-                        tab.setText("Thông báo");
-                        tab.setIcon(R.drawable.notify_icon);
-                        if(tab.isSelected()){
-                            tab.setIcon(R.drawable.notify_icon_selected);
-                        }
-                        else {
-                            tab.setIcon(R.drawable.explore_icon);
-                        }
-                        break;
-                    case 4:
-                        tab.setText("Tài khoản");
-                        if(tab.isSelected()){
-                            tab.setIcon(R.drawable.account_icon_selected);
-                        }
-                        else {
-                            tab.setIcon(R.drawable.account_icon);
-                        }
-                        break;
-                    default:
-                        break;
-                }
+                View v = getLayoutInflater().inflate(R.layout.custom_tab, null);
+                txtCustomTab = (TextView)v.findViewById(R.id.txtCustomTab);
+                imgCustomTab = (ImageView)v.findViewById(R.id.imgCustomTab);
+                txtCustomTab.setText(customTextTab[position]);
+                imgCustomTab.setImageResource(customImagesTab[position]);
+                tab.setCustomView(v);
             }
         }).attach();
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                tabLayout.getTabAt(position).setIcon(R.drawable.home_icon_selected);
+                View selectedView = tabLayout.getTabAt(position).getCustomView();
+                txtCustomTab = (TextView)selectedView.findViewById(R.id.txtCustomTab);
+                imgCustomTab = (ImageView)selectedView.findViewById(R.id.imgCustomTab);
+                txtCustomTab.setText(customTextTab[position]);
+                txtCustomTab.setTextColor(Color.WHITE);
+                imgCustomTab.setImageResource(customImagesTabSelected[position]);
+                tabLayout.getTabAt(position).setCustomView(selectedView);
+
+                for(int i = 0; i < tabLayout.getTabCount(); i++){
+                    if(i == position){
+                        continue;
+                    }
+                    else {
+                        View v = tabLayout.getTabAt(i).getCustomView();
+                        txtCustomTab = (TextView)v.findViewById(R.id.txtCustomTab);
+                        imgCustomTab = (ImageView)v.findViewById(R.id.imgCustomTab);
+                        txtCustomTab.setText(customTextTab[i]);
+                        txtCustomTab.setTextColor(Color.parseColor("#99A5F8C0"));
+                        imgCustomTab.setImageResource(customImagesTab[i]);
+                        tabLayout.getTabAt(i).setCustomView(v);
+                    }
+                }
             }
         });
     }
