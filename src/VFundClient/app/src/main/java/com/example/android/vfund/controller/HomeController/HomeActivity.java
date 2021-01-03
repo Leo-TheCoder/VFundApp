@@ -82,7 +82,7 @@ public class HomeActivity extends AppCompatActivity {
                 txtCustomTab = (TextView)selectedView.findViewById(R.id.txtCustomTab);
                 imgCustomTab = (ImageView)selectedView.findViewById(R.id.imgCustomTab);
                 txtCustomTab.setText(customTextTab[position]);
-                txtCustomTab.setTextColor(Color.WHITE);
+                txtCustomTab.setTextColor(Color.parseColor("#D2FBDB"));
                 imgCustomTab.setImageResource(customImagesTabSelected[position]);
                 tabLayout.getTabAt(position).setCustomView(selectedView);
 

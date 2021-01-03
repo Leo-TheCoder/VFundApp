@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/txtStoryEvent_Detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text=
+            "Vắc xin COVID-19 do Việt Nam sản xuất sẽ trải qua 3 giai đoạn tiêm thử nghiệm lâm sàng trên người.
+Giai đoạn 1 tiêm cho khoảng 60 người, giai đoạn 2 có khoảng 400-600 người tham gia. Giai đoạn 3, phải cần ít nhất 3.000 người, có thể mở rộng diện tham gia ra tới 30.000 người, nghiên cứu đa trung tâm, đa vùng.\nDự kiến ngày 21/12, Học viện Quân y sẽ tiếp tục tiêm thử nghiệm cho những tình nguyện viên còn lại tham gia giai đoạn 1"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:lineSpacingExtra="4sp"
+        android:layout_margin="25dp"/>
+</LinearLayout>
