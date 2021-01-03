@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:text="Trang chủ"
         android:textSize="10sp"
-        android:textColor="#99A5F8C0"/>
+        android:textColor="#99A5F8C0"
+        android:layout_gravity="center"/>
 
 </LinearLayout>

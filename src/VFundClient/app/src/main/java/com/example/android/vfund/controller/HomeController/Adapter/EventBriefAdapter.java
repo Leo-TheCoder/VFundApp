@@ -15,29 +15,19 @@ import com.example.android.vfund.R;
 import com.example.android.vfund.model.FundraisingEvent;
 
 import java.util.ArrayList;
-import java.util.List;
 
-public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.ViewHolder> {
+public class EventBriefAdapter extends ListAdapter<FundraisingEvent, EventBriefAdapter.ViewHolder> {
 
-    private boolean isFollowed = false;
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-
-        public Button btnFollow;
-
+    public class ViewHolder extends RecyclerView.ViewHolder{
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            btnFollow = (Button)itemView.findViewById(R.id.btnFollowEvent);
-
-            if(isFollowed) {
-                btnFollow.setVisibility(View.GONE);
-            }
         }
     }
 
+
     private ArrayList<FundraisingEvent> _eventList;
 
-    public EventAdapter(){
+    public EventBriefAdapter(){
         super(DIFF_CALLBACK);
         _eventList = new ArrayList<FundraisingEvent>();
         _eventList.add(new FundraisingEvent());
@@ -46,24 +36,21 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
         submitList(_eventList);
     }
 
-    public void setFollowed(boolean value) {
-        isFollowed = value;
-    }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public EventBriefAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         // Inflate the custom layout
-        View contactView = inflater.inflate(R.layout.item_event_home, parent, false);
+        View contactView = inflater.inflate(R.layout.item_event_account, parent, false);
         // Return a new holder instance
-        ViewHolder viewHolder = new ViewHolder(contactView);
+        EventBriefAdapter.ViewHolder viewHolder = new EventBriefAdapter.ViewHolder(contactView);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull EventBriefAdapter.ViewHolder holder, int position) {
 
 
     }

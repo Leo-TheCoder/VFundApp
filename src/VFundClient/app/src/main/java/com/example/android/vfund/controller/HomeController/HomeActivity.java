@@ -14,7 +14,9 @@ import android.widget.TextView;
 
 import com.example.android.vfund.R;
 import com.example.android.vfund.controller.HomeController.Adapter.EventAdapter;
+import com.example.android.vfund.controller.HomeController.Adapter.EventBriefAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.HomeViewPagerAdapter;
+import com.example.android.vfund.controller.HomeController.Adapter.NotificationAdapter;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -34,6 +36,8 @@ public class HomeActivity extends AppCompatActivity {
     private int numOfTab = 5;
 
     private EventAdapter myEventAdapter;
+    private NotificationAdapter myNotifyAdapter;
+    private EventBriefAdapter myEventBriefAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +50,13 @@ public class HomeActivity extends AppCompatActivity {
         homeViewPagerAdapter = new HomeViewPagerAdapter(this);
 
         myEventAdapter = new EventAdapter();
+        myNotifyAdapter = new NotificationAdapter();
+        myEventBriefAdapter = new EventBriefAdapter();
         homeViewPagerAdapter.setNumOfTab(numOfTab);
+
         homeViewPagerAdapter.setEventAdapter(myEventAdapter);
+        homeViewPagerAdapter.setNotifyAdapter(myNotifyAdapter);
+        homeViewPagerAdapter.setEventBriefAdapter(myEventBriefAdapter);
 
         viewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         viewPager.setAdapter(homeViewPagerAdapter);
@@ -73,7 +82,7 @@ public class HomeActivity extends AppCompatActivity {
                 txtCustomTab = (TextView)selectedView.findViewById(R.id.txtCustomTab);
                 imgCustomTab = (ImageView)selectedView.findViewById(R.id.imgCustomTab);
                 txtCustomTab.setText(customTextTab[position]);
-                txtCustomTab.setTextColor(Color.WHITE);
+                txtCustomTab.setTextColor(Color.parseColor("#D2FBDB"));
                 imgCustomTab.setImageResource(customImagesTabSelected[position]);
                 tabLayout.getTabAt(position).setCustomView(selectedView);
 

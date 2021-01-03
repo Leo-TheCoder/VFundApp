@@ -1,4 +1,4 @@
-package com.example.android.vfund.controller.HomeController;
+package com.example.android.vfund.controller.EventDetailController;
 
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -13,24 +13,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.vfund.R;
-import com.example.android.vfund.controller.HomeController.Adapter.EventAdapter;
-import com.example.android.vfund.controller.HomeController.Adapter.NotificationAdapter;
-import com.example.android.vfund.model.Notification;
+import com.example.android.vfund.controller.EventDetailController.Adapter.DonateAdapter;
 
-public class NotificationPageFragment extends Fragment {
+public class DonateFragment extends Fragment {
 
-    private static NotificationAdapter mNotifyAdapter;
-    private RecyclerView notificationPageRecyclerView;
+    private static DonateAdapter mDonateAdapter;
+    private RecyclerView donatePageRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-    private final String KEY_STATE_NOTIFY_PAGE_RECYCLERVIEW = "notifyPageRecyclerView";
+    private final String KEY_STATE_DONATE_PAGE_RECYCLERVIEW = "donatePageRecyclerView";
     private Parcelable mState;
 
-    public NotificationPageFragment() {
+    public DonateFragment() {
         // Required empty public constructor
     }
 
-    public NotificationPageFragment(NotificationAdapter notifyAdapter) {
-        mNotifyAdapter = notifyAdapter;
+    public DonateFragment(DonateAdapter adapter) {
+        mDonateAdapter = adapter;
     }
 
     @Override
@@ -48,24 +46,24 @@ public class NotificationPageFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        notificationPageRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewEvent);
-        notificationPageRecyclerView.setAdapter(mNotifyAdapter);
+        donatePageRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerViewEvent);
+        donatePageRecyclerView.setAdapter(mDonateAdapter);
         mLayoutManager = new LinearLayoutManager(getActivity());
-        notificationPageRecyclerView.setLayoutManager(mLayoutManager);
+        donatePageRecyclerView.setLayoutManager(mLayoutManager);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         mState = mLayoutManager.onSaveInstanceState();
-        outState.putParcelable(KEY_STATE_NOTIFY_PAGE_RECYCLERVIEW, mState);
+        outState.putParcelable(KEY_STATE_DONATE_PAGE_RECYCLERVIEW, mState);
     }
 
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         if(savedInstanceState != null)
-            mState = savedInstanceState.getParcelable(KEY_STATE_NOTIFY_PAGE_RECYCLERVIEW);
+            mState = savedInstanceState.getParcelable(KEY_STATE_DONATE_PAGE_RECYCLERVIEW);
     }
 
     @Override
@@ -73,6 +71,6 @@ public class NotificationPageFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         // Retrieve list state and list/item positions
         if(savedInstanceState != null)
-            mState = savedInstanceState.getParcelable(KEY_STATE_NOTIFY_PAGE_RECYCLERVIEW);
+            mState = savedInstanceState.getParcelable(KEY_STATE_DONATE_PAGE_RECYCLERVIEW);
     }
 }

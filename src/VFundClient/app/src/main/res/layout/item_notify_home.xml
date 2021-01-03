@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:layout_marginTop="24dp">
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewAvatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="12dp"
+        app:cardCornerRadius="40dp"
+        android:layout_centerHorizontal="true"
+        android:innerRadius="0dp"
+        android:shape="ring"
+        android:thicknessRatio="1.9"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="10dp"
+        android:layout_centerVertical="true">
+        <ImageView
+            android:id="@+id/imgAvatarIcon_Notify"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+            android:layout_centerVertical="true"
+            android:src="@drawable/test_avatar"/>
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/cardViewAvatar">
+        <TextView
+            android:id="@+id/txtNameEvent_Notify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="VACCIN COVID-19"
+            android:textAllCaps="true"
+            android:textColor="#D2FBDB"
+            android:textSize="15sp"
+            />
+
+        <TextView
+            android:id="@+id/txtNameOwner_Notify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Em Gái Mưa đã quyên góp"
+            android:textSize="15sp"
+            android:textColor="@android:color/white"/>
+
+        <TextView
+            android:id="@+id/txtTime_Notify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="18:00"
+            android:textSize="13sp"
+            android:textColor="#818C99"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtMoney_Notify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="+ 20 000 VND"
+        android:textAllCaps="true"
+        android:textSize="15sp"
+        android:textColor="@android:color/white"/>
+
+</RelativeLayout>

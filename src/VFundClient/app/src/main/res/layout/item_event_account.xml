@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="20dp">
+
+    <ImageView
+        android:id="@+id/imgEventIcon_Account"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/custom_square_image"
+        android:src="@drawable/logo_x2" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/imgEventIcon_Account"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtNameEvent_Account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="VACCIN COVID-19"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/txtEventState_Account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đang hoạt động"
+            android:textColor="@color/colorPrimaryLightGreen"
+            android:textSize="15sp" />
+    </LinearLayout>
+    <ImageButton
+        android:id="@+id/imgBtnEventSetting_Account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/vert_icon_13"
+        android:background="@android:color/transparent"/>
+
+</RelativeLayout>
