@@ -4,24 +4,28 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.example.android.vfund.R;
+import com.example.android.vfund.controller.DonateController.DonateActivity;
 import com.example.android.vfund.controller.EventDetailController.Adapter.DonateAdapter;
 import com.example.android.vfund.controller.EventDetailController.Adapter.EventDetailAdapter;
 import com.example.android.vfund.model.FundraisingEvent;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-public class EventDetailActivity extends AppCompatActivity {
+public class EventDetailActivity extends AppCompatActivity implements View.OnClickListener{
 
     ViewPager2 viewPager;
     TextView txtCustomTab;
+    Button btnDonate;
 
     CharSequence[] customTextTab = {"Nội dung", "Đóng góp"};
 
@@ -37,6 +41,8 @@ public class EventDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event_detail);
 
         viewPager = (ViewPager2)findViewById(R.id.viewpager_detail);
+        btnDonate = (Button)findViewById(R.id.btnDonate_Detail);
+        btnDonate.setOnClickListener(this);
 
         eventDetailPagerAdapter = new EventDetailAdapter(this);
 
@@ -51,6 +57,12 @@ public class EventDetailActivity extends AppCompatActivity {
         viewPager.setAdapter(eventDetailPagerAdapter);
         viewPager.setOffscreenPageLimit(2);
 
+       setUpTabLayout();
+
+
+    }
+
+    private void setUpTabLayout() {
         final TabLayout tabLayout = (TabLayout)findViewById(R.id.detailTabLayout);
         new TabLayoutMediator(tabLayout, viewPager, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
@@ -85,5 +97,13 @@ public class EventDetailActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == btnDonate.getId()){
+            Intent getToDonateActivity = new Intent(this, DonateActivity.class);
+            startActivity(getToDonateActivity);
+        }
     }
 }

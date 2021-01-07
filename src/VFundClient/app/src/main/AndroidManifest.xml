@@ -25,7 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DonateActivity"></activity>
+        <activity android:name=".controller.DonateController.DonateActivity"></activity>
 
 
 

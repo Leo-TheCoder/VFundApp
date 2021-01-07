@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="25dp"
-    tools:context=".DonateActivity">
+    tools:context=".controller.DonateController.DonateActivity">
 
     <LinearLayout
         app:layout_constraintTop_toTopOf="parent"

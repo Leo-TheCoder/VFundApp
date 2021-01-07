@@ -1,4 +1,4 @@
-package com.example.android.vfund;
+package com.example.android.vfund.controller.DonateController;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,6 +8,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
+
+import com.example.android.vfund.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
