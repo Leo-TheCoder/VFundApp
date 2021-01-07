@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.content.AsyncTaskLoader;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import com.example.android.vfund.controller.HomeController.Adapter.EventBriefAda
 import com.example.android.vfund.controller.HomeController.Adapter.HomeViewPagerAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.NotificationAdapter;
 import com.example.android.vfund.model.FundraisingEvent;
+import com.example.android.vfund.model.User;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -48,6 +50,10 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        Intent callingIntent = getIntent();
+        Bundle userBundle = callingIntent.getExtras();
+        User loginUser = userBundle.getParcelable("user");
+
         txtAddEvent = (TextView)findViewById(R.id.txtAddEvent);
         viewPager = (ViewPager2)findViewById(R.id.viewpager);
 
@@ -63,6 +69,7 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
         homeViewPagerAdapter.setEventFollowedAdapter(myEventFollowedAdapter);
         homeViewPagerAdapter.setNotifyAdapter(myNotifyAdapter);
         homeViewPagerAdapter.setEventBriefAdapter(myEventBriefAdapter);
+        homeViewPagerAdapter.setLoginUser(loginUser);
 
         viewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         viewPager.setAdapter(homeViewPagerAdapter);

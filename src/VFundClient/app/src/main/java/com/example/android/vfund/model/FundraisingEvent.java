@@ -10,6 +10,7 @@ public class FundraisingEvent {
     private float _eventGoal;
     private float _eventRate;
     private boolean _isFollowed;
+    private float _currentGain;
 
     public String get_eventID() {
         return _eventID;

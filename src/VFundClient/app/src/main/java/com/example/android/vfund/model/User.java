@@ -1,12 +1,15 @@
 package com.example.android.vfund.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class User {
+public class User implements Parcelable {
     private String _name;
     private String _password;
     private String _email;
@@ -30,6 +33,27 @@ public class User {
         this._phone = phone;
     }
 
+    protected User(Parcel in) {
+        _name = in.readString();
+        _password = in.readString();
+        _email = in.readString();
+        _phone = in.readString();
+        _id = in.readInt();
+        _age = in.readInt();
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
+
     public String get_email() {
         return _email;
     }
@@ -50,4 +74,18 @@ public class User {
         return _name;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(_name);
+        dest.writeString(_password);
+        dest.writeString(_email);
+        dest.writeString(_phone);
+        dest.writeInt(_id);
+        dest.writeInt(_age);
+    }
 }

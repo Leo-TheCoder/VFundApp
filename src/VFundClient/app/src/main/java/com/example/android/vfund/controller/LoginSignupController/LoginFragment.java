@@ -31,10 +31,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class LoginFragment extends Fragment implements View.OnClickListener, LoaderManager.LoaderCallbacks<User> {
+public class LoginFragment extends Fragment implements View.OnClickListener{
     private static LoginFragment loginFragment = null;
     private LoginSignupActivity hostActivity;
-    private static final int LOGIN_LOADER = 1;
 
     EditText editEmail, editPassword;
     Button btnConfirmLogin, btnFacebookLogin, btnGoogleLogin;
@@ -90,10 +89,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Loa
         if(v.getId()==btnConfirmLogin.getId()){
             final String email = editEmail.getText().toString();
             final String password = editPassword.getText().toString();
-            Bundle bundle =new Bundle();
-            bundle.putString("email", email);
-            bundle.putString("password", password);
-            //LoaderManager.getInstance(this).initLoader(LOGIN_LOADER, bundle, this);
+
+
             final ExecutorService executor = Executors.newSingleThreadExecutor();
             final Handler handler = new Handler(Looper.getMainLooper());
             executor.execute(new Runnable() {
@@ -108,13 +105,16 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Loa
                     requestUrl.append("UserPassword=");
                     requestUrl.append(password);
                     String mUrl = requestUrl.toString();
-                    User loginUser = QueryUtils.fetchUserData(mUrl);
+                    final User loginUser = QueryUtils.fetchUserData(mUrl);
                     if(loginUser != null) {
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
                                 Toast.makeText(getContext(), "Login Successfully", Toast.LENGTH_SHORT).show();
+                                Bundle bundle = new Bundle();
+                                bundle.putParcelable("user", loginUser);
                                 Intent intent = new Intent(getContext(), HomeActivity.class);
+                                intent.putExtras(bundle);
                                 startActivity(intent);
                             }
                         });
@@ -152,62 +152,5 @@ public class LoginFragment extends Fragment implements View.OnClickListener, Loa
 
     }
 
-    @NonNull
-    @Override
-    public Loader<User> onCreateLoader(int id, @Nullable Bundle args) {
-        StringBuilder requestUrl = new StringBuilder();
-        requestUrl.append(hostActivity.LOGIN_REQUEST_URL);
-        requestUrl.append("?");
-        requestUrl.append("UserEmail=");
-        requestUrl.append(args.getString("email"));
-        requestUrl.append("&");
-        requestUrl.append("UserPassword=");
-        requestUrl.append(args.getString("password"));
-        return new LoginAsyncTask(hostActivity, requestUrl.toString());
-    }
 
-    @Override
-    public void onLoadFinished(@NonNull Loader<User> loader, User data) {
-        if(data != null) {
-            Toast.makeText(getContext(), "Login Successfully", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getContext(), HomeActivity.class);
-            startActivity(intent);
-        }
-        else {
-            Toast.makeText(getContext(),"Invalid username or password", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<User> loader) {
-
-    }
-
-    private static class LoginAsyncTask extends AsyncTaskLoader<User> {
-        private String mUrl;
-
-        public LoginAsyncTask(@NonNull Context context, String url) {
-            super(context);
-            mUrl = url;
-        }
-
-
-        @Override
-        protected void onStartLoading() {
-            super.onStartLoading();
-            forceLoad();
-        }
-
-        @Nullable
-        @Override
-        public User loadInBackground() {
-            if(mUrl == null){
-                return null;
-            }
-            User loginUser = QueryUtils.fetchUserData(mUrl);
-            return loginUser;
-
-        }
-
-    }
 }
