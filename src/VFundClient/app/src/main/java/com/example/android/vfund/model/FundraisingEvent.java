@@ -9,6 +9,7 @@ public class FundraisingEvent {
     private Date _eventDate;
     private float _eventGoal;
     private float _eventRate;
+    private boolean _isFollowed;
 
     public String get_eventID() {
         return _eventID;
@@ -26,6 +27,13 @@ public class FundraisingEvent {
         return _eventGoal;
     }
 
+    public boolean is_Followed() {
+        return _isFollowed;
+    }
+
+    public void set_isFollowed(boolean isFollowed) {
+        _isFollowed = isFollowed;
+    }
 
     public FundraisingEvent(){}
 }

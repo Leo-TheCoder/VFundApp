@@ -13,9 +13,10 @@ import com.example.android.vfund.controller.HomeController.NotificationPageFragm
 
 public class HomeViewPagerAdapter extends FragmentStateAdapter {
     private int mNumOfTab;
-    private static EventAdapter mEventAdapter;
-    private static NotificationAdapter mNotifyAdapter;
-    private static EventBriefAdapter mEventBriefAdapter;
+    private EventAdapter mEventAdapter;
+    private NotificationAdapter mNotifyAdapter;
+    private EventBriefAdapter mEventBriefAdapter;
+    private EventAdapter mEventFollowedAdapter;
 
     public HomeViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
@@ -24,6 +25,7 @@ public class HomeViewPagerAdapter extends FragmentStateAdapter {
         this.mNumOfTab = numOfTab;
     }
     public void setEventAdapter(EventAdapter adapter) { mEventAdapter = adapter; }
+    public void setEventFollowedAdapter(EventAdapter adapter) { mEventFollowedAdapter = adapter; }
     public void setNotifyAdapter(NotificationAdapter adapter) { mNotifyAdapter = adapter; }
     public void setEventBriefAdapter(EventBriefAdapter adapter) { mEventBriefAdapter = adapter; }
 
@@ -34,7 +36,7 @@ public class HomeViewPagerAdapter extends FragmentStateAdapter {
             return new HomePageFragment(mEventAdapter);
         }
         else if(position == 1) {
-            return new FollowPageFragment(mEventAdapter);
+            return new FollowPageFragment(mEventFollowedAdapter);
         }
         else if(position == 2) {
             return new ExplorePageFragment();

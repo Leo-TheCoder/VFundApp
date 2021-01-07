@@ -19,7 +19,8 @@
         android:background="@drawable/custom_edit_text"
         android:hint="Mật khẩu"
         android:textColorHint="#99045D56"
-        android:layout_margin="4dp"/>
+        android:layout_margin="4dp"
+        android:inputType="textPassword"/>
     <EditText
         android:id="@+id/edit_confirmPassword"
         android:layout_width="320dp"
@@ -28,7 +29,8 @@
         android:background="@drawable/custom_edit_text"
         android:hint="Xác nhận mật khẩu"
         android:textColorHint="#99045D56"
-        android:layout_margin="4dp"/>
+        android:layout_margin="4dp"
+        android:inputType="textPassword"/>
     
     <Button
         android:id="@+id/btnConfirmRegister"

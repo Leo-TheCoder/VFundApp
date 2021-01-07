@@ -31,6 +31,7 @@ public class DonateAdapter extends ListAdapter<Donate, DonateAdapter.ViewHolder>
         _donateList.add(new Donate());
         _donateList.add(new Donate());
         _donateList.add(new Donate());
+        _donateList.add(new Donate());
         submitList(_donateList);
     }
 
@@ -60,7 +61,7 @@ public class DonateAdapter extends ListAdapter<Donate, DonateAdapter.ViewHolder>
                 }
                 @Override
                 public boolean areContentsTheSame(Donate oldItem, Donate newItem) {
-                    return oldItem.get_donor().get_id().equals(newItem.get_donor().get_id()) &&
+                    return oldItem.get_donor().get_id() == (newItem.get_donor().get_id()) &&
                             oldItem.get_event().get_eventID().equals(newItem.get_event().get_eventID()) &&
                             oldItem.get_money() == newItem.get_money();
                 }

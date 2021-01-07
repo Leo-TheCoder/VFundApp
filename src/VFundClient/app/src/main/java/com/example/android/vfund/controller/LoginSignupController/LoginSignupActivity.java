@@ -21,7 +21,7 @@ public class LoginSignupActivity extends AppCompatActivity implements ActivityCa
     //Fragment login = 1
     //Fragment register = 2
     private int state = 0;
-
+    public static final String LOGIN_REQUEST_URL = "http://10.0.2.2:8080/api/users/getuser";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

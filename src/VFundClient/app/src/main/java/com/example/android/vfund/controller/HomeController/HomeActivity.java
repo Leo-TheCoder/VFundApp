@@ -2,12 +2,14 @@ package com.example.android.vfund.controller.HomeController;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.graphics.Color;
 import android.media.Image;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,10 +19,11 @@ import com.example.android.vfund.controller.HomeController.Adapter.EventAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.EventBriefAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.HomeViewPagerAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.NotificationAdapter;
+import com.example.android.vfund.model.FundraisingEvent;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements EventCallBack {
 
     ViewPager2 viewPager;
     TextView txtAddEvent;
@@ -36,6 +39,7 @@ public class HomeActivity extends AppCompatActivity {
     private int numOfTab = 5;
 
     private EventAdapter myEventAdapter;
+    private EventAdapter myEventFollowedAdapter;
     private NotificationAdapter myNotifyAdapter;
     private EventBriefAdapter myEventBriefAdapter;
 
@@ -49,12 +53,14 @@ public class HomeActivity extends AppCompatActivity {
 
         homeViewPagerAdapter = new HomeViewPagerAdapter(this);
 
-        myEventAdapter = new EventAdapter();
+        myEventAdapter = new EventAdapter(this);
+        myEventFollowedAdapter = new EventAdapter(this);
         myNotifyAdapter = new NotificationAdapter();
         myEventBriefAdapter = new EventBriefAdapter();
         homeViewPagerAdapter.setNumOfTab(numOfTab);
 
         homeViewPagerAdapter.setEventAdapter(myEventAdapter);
+        homeViewPagerAdapter.setEventFollowedAdapter(myEventFollowedAdapter);
         homeViewPagerAdapter.setNotifyAdapter(myNotifyAdapter);
         homeViewPagerAdapter.setEventBriefAdapter(myEventBriefAdapter);
 
@@ -62,6 +68,20 @@ public class HomeActivity extends AppCompatActivity {
         viewPager.setAdapter(homeViewPagerAdapter);
         viewPager.setOffscreenPageLimit(4);
 
+        setUpTabLayout();
+    }
+
+    @Override
+    public void followEvent(FundraisingEvent event) {
+        myEventFollowedAdapter.addEvent(event);
+    }
+
+    @Override
+    public void unfollowEvent(FundraisingEvent event) {
+        myEventFollowedAdapter.removeEvent(event);
+    }
+
+    private void setUpTabLayout() {
         final TabLayout tabLayout = (TabLayout)findViewById(R.id.homeTabLayout);
         new TabLayoutMediator(tabLayout, viewPager, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
@@ -103,5 +123,4 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
-
 }

@@ -1,6 +1,8 @@
 package com.example.android.vfund.controller.HomeController.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +13,11 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.android.vfund.ItemClickListener;
 import com.example.android.vfund.R;
+import com.example.android.vfund.controller.EventDetailController.Adapter.EventDetailAdapter;
+import com.example.android.vfund.controller.EventDetailController.EventDetailActivity;
+import com.example.android.vfund.controller.HomeController.HomeActivity;
 import com.example.android.vfund.model.FundraisingEvent;
 
 import java.util.ArrayList;
@@ -21,25 +27,40 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
 
     private boolean isFollowed = false;
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public Button btnFollow;
+        private ItemClickListener itemClickListener;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            itemView.setOnClickListener(this);
             btnFollow = (Button)itemView.findViewById(R.id.btnFollowEvent);
 
             if(isFollowed) {
                 btnFollow.setVisibility(View.GONE);
             }
         }
+
+        public void setItemClickListener(ItemClickListener itemClickListener) {
+            this.itemClickListener = itemClickListener;
+        }
+
+        @Override
+        public void onClick(View v) {
+            itemClickListener.onClick(v, getAdapterPosition(), false);
+        }
     }
 
     private ArrayList<FundraisingEvent> _eventList;
+    private Context _context;
+    private HomeActivity parentActivity;
 
-    public EventAdapter(){
+    public EventAdapter(HomeActivity activity){
         super(DIFF_CALLBACK);
+        parentActivity = activity;
         _eventList = new ArrayList<FundraisingEvent>();
+        _eventList.add(new FundraisingEvent());
         _eventList.add(new FundraisingEvent());
         _eventList.add(new FundraisingEvent());
         _eventList.add(new FundraisingEvent());
@@ -48,6 +69,19 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
 
     public void setFollowed(boolean value) {
         isFollowed = value;
+    }
+
+    public void addEvent(FundraisingEvent event) {
+        _eventList.add(event);
+        submitList(_eventList);
+        notifyDataSetChanged(); //delete when having real data
+    }
+
+    public void removeEvent(FundraisingEvent event) {
+        if(_eventList.remove(event)){
+            submitList(_eventList);
+            notifyDataSetChanged(); //delete when having real data
+        };
     }
 
     @NonNull
@@ -64,7 +98,40 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        final FundraisingEvent currentEvent = getItem(position);
 
+        final Button btnFollow = holder.btnFollow;
+        btnFollow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.e("Clicke", "test");
+                boolean isFollow = currentEvent.is_Followed();
+                currentEvent.set_isFollowed(!isFollow);
+                if(!isFollow == true) {
+                    btnFollow.setBackgroundResource(R.drawable.custom_button_follow_checked);
+                    btnFollow.setText("Đã theo dõi");
+                    parentActivity.followEvent(currentEvent);
+                }
+                else {
+                    btnFollow.setBackgroundResource(R.drawable.custom_button_follow);
+                    btnFollow.setText("+ Theo dõi");
+                    parentActivity.unfollowEvent(currentEvent);
+                }
+            }
+        });
+        holder.setItemClickListener(new ItemClickListener() {
+            @Override
+            public void onClick(View view, int position, boolean isLongClick) {
+                if(view.getId() == btnFollow.getId()) {
+
+
+                }
+                else {
+                    Intent intent = new Intent(parentActivity, EventDetailActivity.class);
+                    parentActivity.startActivity(intent);
+                }
+            }
+        });
 
     }
 
