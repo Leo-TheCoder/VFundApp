@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="25dp"
+    tools:context=".DonateActivity">
+
+    <LinearLayout
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textField"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/editAmount"
+        app:counterMaxLength="9"
+        app:endIconMode="clear_text"
+        app:errorEnabled="true"
+        app:suffixText="@string/usd"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:maxLength="22"
+            android:maxLines="1"
+            android:minLines="1"
+            android:lines="1"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đóng góp ẩn danh"
+        android:layout_marginBottom="15dp"
+        android:textColor="@color/white"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/menu"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/paymentmenu"
+        android:textColorHint="@color/white">
+
+        <AutoCompleteTextView
+            android:id="@+id/autoComplete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <include
+        android:id="@+id/layout_creditcard"
+        layout="@layout/layout_creditcard"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/layout_momo"
+        layout="@layout/layout_momo"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/layout_zalopay"
+        layout="@layout/layout_zalopay"
+        android:visibility="gone" />
+
+    </LinearLayout>
+
+    <Button
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ĐÓNG GÓP NGAY"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
