@@ -16,4 +16,8 @@
         <item name="android:textColor">@android:color/white</item>
 
     </style>
+
+    <style name="CustomExposedDropdown" parent="Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu">
+        <item name="android:textSize">16sp</item>
+    </style>
 </resources>
