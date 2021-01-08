@@ -3,6 +3,7 @@ package com.example.android.vfund.controller;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
 
+import com.example.android.vfund.model.FundraisingEvent;
 import com.example.android.vfund.model.User;
 
 import org.json.JSONArray;
@@ -18,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -128,7 +130,7 @@ public final class QueryUtils {
     }
 
     /**
-     * Return a list of {@link User} objects that has been built up from
+     * Return a {@link User} objects that has been built up from
      * parsing a JSON response.
      */
     public static User extractUser(String jsonResponse) {
@@ -157,6 +159,63 @@ public final class QueryUtils {
 
         // Return the user
         return thisUser;
+    }
+
+    public static ArrayList<FundraisingEvent> fetchEventData(String requestUrl) {
+        //Create URL object
+        URL url = createUrl(requestUrl);
+
+        //Perform HTTP request to the URL and receive a JSON response back
+        String jsonResponse = null;
+        try {
+            jsonResponse = makeHttpRequest(url);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error closing input stream" , e);
+        }
+
+        //Extract relevant fields from the JSON response and create an {@link User} object
+        ArrayList<FundraisingEvent> eventList = extractEventList(jsonResponse);
+
+        return eventList;
+    }
+
+    /**
+     * Return a list of {@link FundraisingEvent} objects that has been built up from
+     * parsing a JSON response.
+     */
+    public static ArrayList<FundraisingEvent> extractEventList(String jsonResponse) {
+
+        ArrayList<FundraisingEvent> eventList = new ArrayList<FundraisingEvent>();
+        // Try to parse the SAMPLE_JSON_RESPONSE. If there's a problem with the way the JSON
+        // is formatted, a JSONException exception object will be thrown.
+        // Catch the exception so the app doesn't crash, and print the error message to the logs.
+        try {
+            JSONObject root = new JSONObject(jsonResponse);
+            JSONArray events = root.getJSONArray("recordset");
+
+            for(int i = 0; events.getJSONObject(i) != null; i++) {
+                JSONObject event = events.getJSONObject(i);
+                String hostId = event.getString("HostID");
+                User hostEvent = fetchUserData("http://10.0.2.2:8080/api/users/getuser?IDandPrefix="+hostId);
+                FundraisingEvent newEvent = new FundraisingEvent(event.getInt("ID"), event.getString("EventName"),
+                        event.getString("EventDescription"),event.getString("EventDate"),false,
+                        event.getInt("EventGoal"));
+                newEvent.set_owner(hostEvent);
+                eventList.add(newEvent);
+
+            }
+            // TODO: Parse the response given by the SAMPLE_JSON_RESPONSE string and
+            // build up a User objects with the corresponding data.
+
+        } catch (JSONException e) {
+            // If an error is thrown when executing any of the above statements in the "try" block,
+            // catch the exception here, so the app doesn't crash. Print a log message
+            // with the message from the exception.
+            Log.e("QueryUtils", "Problem parsing the event JSON results");
+        }
+
+        // Return the user
+        return eventList;
     }
 
 }

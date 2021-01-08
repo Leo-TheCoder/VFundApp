@@ -22,6 +22,7 @@ import com.example.android.vfund.controller.EventDetailController.Adapter.EventD
 import com.example.android.vfund.controller.EventDetailController.EventDetailActivity;
 import com.example.android.vfund.controller.HomeController.HomeActivity;
 import com.example.android.vfund.model.FundraisingEvent;
+import com.example.android.vfund.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
         public TextView txtMoneyGoalEvent;
         public TextView txtDayLeft;
         public ProgressBar progressEvent;
+        public TextView txtNameOwner;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -49,6 +51,7 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
             txtMoneyGoalEvent = (TextView)itemView.findViewById(R.id.txtMoneyGoalEvent);
             txtDayLeft = (TextView)itemView.findViewById(R.id.txtDayLeft);
             progressEvent = (ProgressBar)itemView.findViewById(R.id.progressEvent);
+            txtNameOwner = (TextView)itemView.findViewById(R.id.txtNameOwner);
 
             if(isFollowed) {
                 btnFollow.setVisibility(View.GONE);
@@ -145,7 +148,10 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
 
         holder.txtMoneyGoalEvent.setText(currentEvent.getStringGoalFormat());
         holder.txtDayLeft.setText(String.valueOf(currentEvent.get_timeRemain()));
-
+        User owner = currentEvent.get_owner();
+        if(owner != null) {
+            holder.txtNameOwner.setText(owner.get_name());
+        }
         holder.txtProgressEvent.setText(currentEvent.getStringPercentage());
         final Button btnFollow = holder.btnFollow;
         btnFollow.setOnClickListener(new View.OnClickListener() {

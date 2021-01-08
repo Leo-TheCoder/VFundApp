@@ -3,9 +3,12 @@ package com.example.android.vfund.controller.HomeController;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
@@ -22,12 +25,15 @@ import com.example.android.vfund.controller.HomeController.Adapter.EventAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.EventBriefAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.HomeViewPagerAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.NotificationAdapter;
+import com.example.android.vfund.controller.QueryUtils;
 import com.example.android.vfund.model.FundraisingEvent;
 import com.example.android.vfund.model.User;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-public class HomeActivity extends AppCompatActivity implements EventCallBack {
+import java.util.ArrayList;
+
+public class HomeActivity extends AppCompatActivity implements EventCallBack, LoaderManager.LoaderCallbacks<ArrayList<FundraisingEvent>> {
 
     ViewPager2 viewPager;
     TextView txtAddEvent;
@@ -39,10 +45,12 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
     int[] customImagesTabSelected = {R.drawable.home_icon_selected, R.drawable.follow_icon_selected,
             R.drawable.explore_icon_selected, R.drawable.notify_icon_selected, R.drawable.account_icon_selected};
     public static final int REQUEST_DONATED_CODE = 1;
+    private final int ID_FETCH_EVENT_LOADER = 1;
 
     private HomeViewPagerAdapter homeViewPagerAdapter;
     private int numOfTab = 5;
 
+    private static final String EVENT_REQUEST_URL = "http://10.0.2.2:8080/api/events/getevent";
     private EventAdapter myEventAdapter;
     private EventAdapter myEventFollowedAdapter;
     private NotificationAdapter myNotifyAdapter;
@@ -66,6 +74,9 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
         myEventFollowedAdapter = new EventAdapter(this);
         myNotifyAdapter = new NotificationAdapter();
         myEventBriefAdapter = new EventBriefAdapter();
+
+        LoaderManager.getInstance(this).initLoader(ID_FETCH_EVENT_LOADER, null, this);
+
         homeViewPagerAdapter.setNumOfTab(numOfTab);
 
         homeViewPagerAdapter.setEventAdapter(myEventAdapter);
@@ -155,5 +166,45 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
                 }
             }
         });
+    }
+
+    @NonNull
+    @Override
+    public Loader<ArrayList<FundraisingEvent>> onCreateLoader(int id, @Nullable Bundle args) {
+        return new EventAsyncTaskLoader(this, EVENT_REQUEST_URL);
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<ArrayList<FundraisingEvent>> loader, ArrayList<FundraisingEvent> data) {
+        myEventAdapter.submitList(data);
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<ArrayList<FundraisingEvent>> loader) {
+        myEventAdapter.submitList(null);
+    }
+
+    private static class EventAsyncTaskLoader extends AsyncTaskLoader<ArrayList<FundraisingEvent>>{
+        private String mURL = null;
+        public EventAsyncTaskLoader(@NonNull Context context, String url) {
+            super(context);
+            mURL = url;
+        }
+
+        @Override
+        protected void onStartLoading() {
+            super.onStartLoading();
+            forceLoad();
+        }
+
+        @Nullable
+        @Override
+        public ArrayList<FundraisingEvent> loadInBackground() {
+            if(mURL == null) {
+                return null;
+            }
+            ArrayList<FundraisingEvent> eventList = QueryUtils.fetchEventData(mURL);
+            return eventList;
+        }
     }
 }
