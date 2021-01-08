@@ -10,12 +10,15 @@ import com.example.android.vfund.controller.HomeController.ExplorePageFragment;
 import com.example.android.vfund.controller.HomeController.FollowPageFragment;
 import com.example.android.vfund.controller.HomeController.HomePageFragment;
 import com.example.android.vfund.controller.HomeController.NotificationPageFragment;
+import com.example.android.vfund.model.User;
 
 public class HomeViewPagerAdapter extends FragmentStateAdapter {
     private int mNumOfTab;
-    private static EventAdapter mEventAdapter;
-    private static NotificationAdapter mNotifyAdapter;
-    private static EventBriefAdapter mEventBriefAdapter;
+    private EventAdapter mEventAdapter;
+    private NotificationAdapter mNotifyAdapter;
+    private EventBriefAdapter mEventBriefAdapter;
+    private EventAdapter mEventFollowedAdapter;
+    private User mLoginUser;
 
     public HomeViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
@@ -24,8 +27,10 @@ public class HomeViewPagerAdapter extends FragmentStateAdapter {
         this.mNumOfTab = numOfTab;
     }
     public void setEventAdapter(EventAdapter adapter) { mEventAdapter = adapter; }
+    public void setEventFollowedAdapter(EventAdapter adapter) { mEventFollowedAdapter = adapter; }
     public void setNotifyAdapter(NotificationAdapter adapter) { mNotifyAdapter = adapter; }
     public void setEventBriefAdapter(EventBriefAdapter adapter) { mEventBriefAdapter = adapter; }
+    public void setLoginUser(User loginUser) { mLoginUser = loginUser; }
 
     @NonNull
     @Override
@@ -34,7 +39,7 @@ public class HomeViewPagerAdapter extends FragmentStateAdapter {
             return new HomePageFragment(mEventAdapter);
         }
         else if(position == 1) {
-            return new FollowPageFragment(mEventAdapter);
+            return new FollowPageFragment(mEventFollowedAdapter);
         }
         else if(position == 2) {
             return new ExplorePageFragment();
@@ -43,7 +48,7 @@ public class HomeViewPagerAdapter extends FragmentStateAdapter {
             return new NotificationPageFragment(mNotifyAdapter);
         }
         else if(position == 4) {
-            return new AccountPageFragment(mEventBriefAdapter);
+            return new AccountPageFragment(mEventBriefAdapter, mLoginUser);
         }
         else {
             return null;

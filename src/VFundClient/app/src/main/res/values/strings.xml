@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">VFund</string>
+    <string name="editAmount">Số tiền</string>
+    <string name="vnd">VNĐ</string>
+    <string name="editName">Họ và tên</string>
+    <string name="paymentmenu">Chọn hình thức thanh toán</string>
+    <string name="cardNumber">Số thẻ</string>
 </resources>

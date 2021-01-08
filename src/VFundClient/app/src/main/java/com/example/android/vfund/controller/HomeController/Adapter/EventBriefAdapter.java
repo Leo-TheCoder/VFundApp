@@ -59,13 +59,13 @@ public class EventBriefAdapter extends ListAdapter<FundraisingEvent, EventBriefA
             new DiffUtil.ItemCallback<FundraisingEvent>() {
                 @Override
                 public boolean areItemsTheSame(FundraisingEvent oldItem, FundraisingEvent newItem) {
-                    return oldItem.get_eventID().equals(newItem.get_eventID());
+                    return oldItem.get_eventID() == newItem.get_eventID();
                 }
                 @Override
                 public boolean areContentsTheSame(FundraisingEvent oldItem, FundraisingEvent newItem) {
                     return oldItem.get_eventName().equals(newItem.get_eventName()) &&
                             oldItem.get_eventGoal() == newItem.get_eventGoal() &&
-                            oldItem.get_eventDate().equals(newItem.get_eventDate());
+                            oldItem.get_timeRemain() == newItem.get_timeRemain();
                 }
             };
 }

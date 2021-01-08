@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -19,7 +20,8 @@
         android:background="@drawable/custom_edit_text"
         android:hint="Mật khẩu"
         android:textColorHint="#99045D56"
-        android:layout_margin="4dp"/>
+        android:layout_margin="4dp"
+        android:inputType="textPassword"/>
 
     <Button
         android:id="@+id/btnConfirmLogin"
