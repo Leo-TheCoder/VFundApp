@@ -1,7 +1,12 @@
 package com.example.android.vfund.controller.HomeController.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +25,7 @@ import com.example.android.vfund.controller.EventDetailController.Adapter.EventD
 import com.example.android.vfund.controller.EventDetailController.EventDetailActivity;
 import com.example.android.vfund.controller.HomeController.HomeActivity;
 import com.example.android.vfund.model.FundraisingEvent;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,13 +36,13 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public Button btnFollow;
+        public MaterialButton btnFollow;
         private ItemClickListener itemClickListener;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            btnFollow = (Button)itemView.findViewById(R.id.btnFollowEvent);
+            btnFollow = (MaterialButton)itemView.findViewById(R.id.btnFollowEvent);
 
             if(isFollowed) {
                 btnFollow.setVisibility(View.GONE);
@@ -108,12 +115,17 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
                 boolean isFollow = currentEvent.is_Followed();
                 currentEvent.set_isFollowed(!isFollow);
                 if(!isFollow == true) {
-                    btnFollow.setBackgroundResource(R.drawable.custom_button_follow_checked);
+                    ShapeDrawable shapedrawable = new ShapeDrawable();
+                    shapedrawable.setShape(new RectShape());
+                    shapedrawable.getPaint().setColor(Color.parseColor("#045D56"));
+                    shapedrawable.getPaint().setStrokeWidth(0.2f);
+                    shapedrawable.getPaint().setStyle(Paint.Style.STROKE);
+                    btnFollow.setBackground(shapedrawable);
+                    btnFollow.setBackgroundColor(ContextCompat.getColor(_context, android.R.color.transparent));
                     btnFollow.setText("Đã theo dõi");
                     parentActivity.followEvent(currentEvent);
                 }
                 else {
-                    btnFollow.setBackgroundResource(R.drawable.custom_button_follow);
                     btnFollow.setText("+ Theo dõi");
                     parentActivity.unfollowEvent(currentEvent);
                 }
