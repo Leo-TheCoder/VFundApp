@@ -2,11 +2,14 @@ package com.example.android.vfund.controller.HomeController.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
@@ -31,11 +34,21 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
 
         public Button btnFollow;
         private ItemClickListener itemClickListener;
+        public TextView txtDescriptionEvent;
+        public TextView txtProgressEvent;
+        public TextView txtMoneyGoalEvent;
+        public TextView txtDayLeft;
+        public ProgressBar progressEvent;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
             btnFollow = (Button)itemView.findViewById(R.id.btnFollowEvent);
+            txtDescriptionEvent = (TextView)itemView.findViewById(R.id.txtDescriptionEvent);
+            txtProgressEvent = (TextView)itemView.findViewById(R.id.txtProgressEvent);
+            txtMoneyGoalEvent = (TextView)itemView.findViewById(R.id.txtMoneyGoalEvent);
+            txtDayLeft = (TextView)itemView.findViewById(R.id.txtDayLeft);
+            progressEvent = (ProgressBar)itemView.findViewById(R.id.progressEvent);
 
             if(isFollowed) {
                 btnFollow.setVisibility(View.GONE);
@@ -60,10 +73,11 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
         super(DIFF_CALLBACK);
         parentActivity = activity;
         _eventList = new ArrayList<FundraisingEvent>();
-        _eventList.add(new FundraisingEvent());
-        _eventList.add(new FundraisingEvent());
-        _eventList.add(new FundraisingEvent());
-        _eventList.add(new FundraisingEvent());
+        for(int i = 0; i < 4; i++) {
+            FundraisingEvent myTestEvent = new FundraisingEvent(i,"Tiêm thử vaccin x" + i , "Event description",
+                    "2021-06-18T00:00:00.000Z", false, 1234567);
+            _eventList.add(myTestEvent);
+        }
         submitList(_eventList);
     }
 
@@ -73,15 +87,34 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
 
     public void addEvent(FundraisingEvent event) {
         _eventList.add(event);
+        submitList(null);
         submitList(_eventList);
-        notifyDataSetChanged(); //delete when having real data
     }
 
     public void removeEvent(FundraisingEvent event) {
         if(_eventList.remove(event)){
+            submitList(null);
             submitList(_eventList);
-            notifyDataSetChanged(); //delete when having real data
         };
+    }
+
+    private int searchEvent(int eventID) {
+        int index = -1;
+        for(int i = 0; i < _eventList.size(); i++) {
+            if(eventID == _eventList.get(i).get_eventID()) {
+                index = i;
+            }
+        }
+        return index;
+    }
+
+    public void updateEvent(FundraisingEvent event) {
+        int index = searchEvent(event.get_eventID());
+        if(index >= 0) {
+            _eventList.set(index, event);
+            submitList(null);
+            submitList(_eventList);
+        }
     }
 
     @NonNull
@@ -100,6 +133,20 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final FundraisingEvent currentEvent = getItem(position);
 
+        holder.progressEvent.setMax(Math.round(currentEvent.get_eventGoal()));
+        holder.progressEvent.setProgress(Math.round(currentEvent.get_currentGain()));
+
+        String description = currentEvent.get_eventDescription();
+        if(description.length() > 50) {
+            description = description.substring(0, 50);
+            description += " ...";
+        }
+        holder.txtDescriptionEvent.setText(description);
+
+        holder.txtMoneyGoalEvent.setText(currentEvent.getStringGoalFormat());
+        holder.txtDayLeft.setText(String.valueOf(currentEvent.get_timeRemain()));
+
+        holder.txtProgressEvent.setText(currentEvent.getStringPercentage());
         final Button btnFollow = holder.btnFollow;
         btnFollow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,14 +169,11 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
         holder.setItemClickListener(new ItemClickListener() {
             @Override
             public void onClick(View view, int position, boolean isLongClick) {
-                if(view.getId() == btnFollow.getId()) {
-
-
-                }
-                else {
-                    Intent intent = new Intent(parentActivity, EventDetailActivity.class);
-                    parentActivity.startActivity(intent);
-                }
+                Intent intent = new Intent(parentActivity, EventDetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("event", currentEvent);
+                intent.putExtras(bundle);
+                parentActivity.startActivityForResult(intent, parentActivity.REQUEST_DONATED_CODE);
             }
         });
 
@@ -139,13 +183,14 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
             new DiffUtil.ItemCallback<FundraisingEvent>() {
                 @Override
                 public boolean areItemsTheSame(FundraisingEvent oldItem, FundraisingEvent newItem) {
-                    return oldItem.get_eventID().equals(newItem.get_eventID());
+                    return oldItem.get_eventID() == newItem.get_eventID();
                 }
                 @Override
                 public boolean areContentsTheSame(FundraisingEvent oldItem, FundraisingEvent newItem) {
                     return oldItem.get_eventName().equals(newItem.get_eventName()) &&
                             oldItem.get_eventGoal() == newItem.get_eventGoal() &&
-                            oldItem.get_eventDate().equals(newItem.get_eventDate());
+                            oldItem.get_currentGain() == newItem.get_currentGain() &&
+                            oldItem.get_timeRemain() == newItem.get_timeRemain();
                 }
             };
 }

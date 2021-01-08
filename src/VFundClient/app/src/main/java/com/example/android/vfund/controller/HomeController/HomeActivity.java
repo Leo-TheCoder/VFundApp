@@ -1,6 +1,7 @@
 package com.example.android.vfund.controller.HomeController;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.content.AsyncTaskLoader;
 import androidx.viewpager2.widget.ViewPager2;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.vfund.R;
 import com.example.android.vfund.controller.HomeController.Adapter.EventAdapter;
@@ -36,6 +38,7 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
     String[] customTextTab = {"Trang chủ", "Theo dõi", "Khám phá", "Thông báo", "Tài khoản"};
     int[] customImagesTabSelected = {R.drawable.home_icon_selected, R.drawable.follow_icon_selected,
             R.drawable.explore_icon_selected, R.drawable.notify_icon_selected, R.drawable.account_icon_selected};
+    public static final int REQUEST_DONATED_CODE = 1;
 
     private HomeViewPagerAdapter homeViewPagerAdapter;
     private int numOfTab = 5;
@@ -79,6 +82,23 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        try {
+            super.onActivityResult(requestCode, resultCode, data);
+            if(requestCode == REQUEST_DONATED_CODE && resultCode == RESULT_OK) {
+                Log.e("LOGTAG", "TESTING");
+                Bundle bundle = data.getExtras();
+                FundraisingEvent event = bundle.getParcelable("event");
+                Log.e("LOGTAG", "" + event.getStringPercentage());
+                updateEvent(event);
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
     public void followEvent(FundraisingEvent event) {
         myEventFollowedAdapter.addEvent(event);
     }
@@ -86,6 +106,12 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
     @Override
     public void unfollowEvent(FundraisingEvent event) {
         myEventFollowedAdapter.removeEvent(event);
+    }
+
+    @Override
+    public void updateEvent(FundraisingEvent event) {
+        myEventAdapter.updateEvent(event);
+        myEventFollowedAdapter.updateEvent(event);
     }
 
     private void setUpTabLayout() {

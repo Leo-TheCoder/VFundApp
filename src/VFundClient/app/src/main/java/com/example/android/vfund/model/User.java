@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class User implements Parcelable {
     private String _name;
@@ -17,19 +18,25 @@ public class User implements Parcelable {
     private int _id;
     private int _age;
 
+    private static SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
     public User(){}
     public User(int id, String name, String email, String birth, String phone) {
         this._id = id;
         this._name = name;
         this._email = email;
-        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+
+        Date date = null;
         try {
-            cal.setTime(SimpleDateFormat.getDateInstance().parse(birth));
-            this._age = Calendar.getInstance().get(Calendar.YEAR) - cal.get(Calendar.YEAR);
+            date = inputFormat.parse(birth);
+            Date now = new Date();
+            long diff = now.getTime() - date.getTime();
+            _age = (int)TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
         } catch (ParseException e) {
             e.printStackTrace();
-            this._age = 0;
+            _age = 0;
         }
+
         this._phone = phone;
     }
 

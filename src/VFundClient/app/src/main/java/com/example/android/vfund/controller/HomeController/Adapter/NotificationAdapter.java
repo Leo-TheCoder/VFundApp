@@ -63,7 +63,7 @@ public class NotificationAdapter extends ListAdapter<Notification, NotificationA
                 @Override
                 public boolean areContentsTheSame(Notification oldItem, Notification newItem) {
                     return oldItem.get_user().get_id() == (newItem.get_user().get_id()) &&
-                            oldItem.get_donatedEvent().get_eventID().equals(newItem.get_donatedEvent().get_eventID());
+                            oldItem.get_donatedEvent().get_eventID() == newItem.get_donatedEvent().get_eventID();
 
                 }
             };

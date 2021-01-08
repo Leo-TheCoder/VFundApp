@@ -48,7 +48,7 @@ public class StoryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
        txtStoryDescription = (TextView)view.findViewById(R.id.txtStoryEvent_Detail);
-       //txtStoryDescription.setText(mEvent.getStoryDescription);
+       txtStoryDescription.setText(mEvent.get_eventDescription());
 
     }
 
