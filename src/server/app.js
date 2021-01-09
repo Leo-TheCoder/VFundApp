@@ -13,10 +13,10 @@ const port = process.env.PORT || 8080;
 app.use('/api/users', require('./routes/api/users'));
 app.use('/api/events', require('./routes/api/events'));
 
+
 app.use(express.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-  }));
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json());
   
 app.get('/', (req, res) => {
     res.send('Hello from server');
