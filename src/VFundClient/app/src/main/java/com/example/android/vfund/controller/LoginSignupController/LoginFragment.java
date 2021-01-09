@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,7 +37,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
     private LoginSignupActivity hostActivity;
 
     EditText editEmail, editPassword;
-    Button btnConfirmLogin, btnFacebookLogin, btnGoogleLogin;
+    Button btnConfirmLogin;
+    ImageButton btnFacebookLogin, btnGoogleLogin;
     TextView txtRegister, txtForgetPassword;
 
     public static LoginFragment getInstance() {
@@ -71,10 +73,10 @@ public class LoginFragment extends Fragment implements View.OnClickListener{
         btnConfirmLogin = (Button)view.findViewById(R.id.btnConfirmLogin);
         btnConfirmLogin.setOnClickListener(this);
 
-        btnFacebookLogin = (Button)view.findViewById(R.id.btnFacebookLogin);
+        btnFacebookLogin = (ImageButton)view.findViewById(R.id.btnFacebookLogin);
         btnFacebookLogin.setOnClickListener(this);
 
-        btnGoogleLogin = (Button)view.findViewById(R.id.btnGoogleLogin);
+        btnGoogleLogin = (ImageButton)view.findViewById(R.id.btnGoogleLogin);
         btnGoogleLogin.setOnClickListener(this);
 
         txtRegister = (TextView)view.findViewById(R.id.txtRegisterFromLogin);
