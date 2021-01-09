@@ -16,15 +16,12 @@
         <activity android:name=".controller.EventDetailController.EventDetailActivity"></activity>
         <activity android:name=".controller.HomeController.HomeActivity"></activity>
         <activity android:name=".controller.LoginSignupController.LoginSignupActivity">
-
-        </activity>
-        <activity
-            android:name=".CreateEventActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".CreateEventActivity">
         </activity>
         <activity android:name=".controller.DonateController.DonateActivity">
         </activity>

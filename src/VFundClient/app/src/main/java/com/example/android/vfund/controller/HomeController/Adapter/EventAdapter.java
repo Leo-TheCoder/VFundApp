@@ -108,8 +108,8 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
 
     public void removeEvent(FundraisingEvent event) {
         if(_eventList.remove(event)){
-            submitList(null);
             submitList(_eventList);
+            notifyDataSetChanged();
         };
     }
 
@@ -165,7 +165,8 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
             holder.txtNameOwner.setText(owner.get_name());
         }
         holder.txtProgressEvent.setText(currentEvent.getStringPercentage());
-        final Button btnFollow = holder.btnFollow;
+
+        final MaterialButton btnFollow = holder.btnFollow;
         btnFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -179,11 +180,18 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
                     shapedrawable.getPaint().setStrokeWidth(0.2f);
                     shapedrawable.getPaint().setStyle(Paint.Style.STROKE);
                     btnFollow.setBackground(shapedrawable);
-                    btnFollow.setBackgroundColor(ContextCompat.getColor(_context, android.R.color.transparent));
+                    btnFollow.setBackgroundColor(Color.TRANSPARENT);
                     btnFollow.setText("Đã theo dõi");
                     parentActivity.followEvent(currentEvent);
                 }
                 else {
+                    ShapeDrawable shapedrawable = new ShapeDrawable();
+                    shapedrawable.setShape(new RectShape());
+                    shapedrawable.getPaint().setColor(Color.parseColor("#045D56"));
+                    shapedrawable.getPaint().setStrokeWidth(0.2f);
+                    shapedrawable.getPaint().setStyle(Paint.Style.STROKE);
+                    btnFollow.setBackground(shapedrawable);
+                    btnFollow.setBackgroundColor(Color.parseColor("#045D56"));
                     btnFollow.setText("+ Theo dõi");
                     parentActivity.unfollowEvent(currentEvent);
                 }
