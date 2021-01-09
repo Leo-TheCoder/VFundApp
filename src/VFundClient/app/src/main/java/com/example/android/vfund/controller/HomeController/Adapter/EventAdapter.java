@@ -3,6 +3,7 @@ package com.example.android.vfund.controller.HomeController.Adapter;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 
 import android.graphics.Color;
@@ -88,11 +89,11 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
         super(DIFF_CALLBACK);
         parentActivity = activity;
         _eventList = new ArrayList<FundraisingEvent>();
-        for(int i = 0; i < 4; i++) {
-            FundraisingEvent myTestEvent = new FundraisingEvent(i,"Tiêm thử vaccin x" + i , "Event description",
-                    "2021-06-18T00:00:00.000Z", false, 1234567);
-            _eventList.add(myTestEvent);
-        }
+//        for(int i = 0; i < 4; i++) {
+//            FundraisingEvent myTestEvent = new FundraisingEvent(i,"Tiêm thử vaccin x" + i , "Event description",
+//                    "2021-06-18T00:00:00.000Z", false, 1234567, 0);
+//            _eventList.add(myTestEvent);
+//        }
         submitList(_eventList);
     }
 
@@ -174,24 +175,15 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
                 boolean isFollow = currentEvent.is_Followed();
                 currentEvent.set_isFollowed(!isFollow);
                 if(!isFollow == true) {
-                    ShapeDrawable shapedrawable = new ShapeDrawable();
-                    shapedrawable.setShape(new RectShape());
-                    shapedrawable.getPaint().setColor(Color.parseColor("#045D56"));
-                    shapedrawable.getPaint().setStrokeWidth(0.2f);
-                    shapedrawable.getPaint().setStyle(Paint.Style.STROKE);
-                    btnFollow.setBackground(shapedrawable);
-                    btnFollow.setBackgroundColor(Color.TRANSPARENT);
+                    btnFollow.setBackgroundColor(Color.parseColor("#055659"));
                     btnFollow.setText("Đã theo dõi");
+                    btnFollow.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#1EB980")));
+                    btnFollow.setStrokeWidth(1);
                     parentActivity.followEvent(currentEvent);
                 }
                 else {
-                    ShapeDrawable shapedrawable = new ShapeDrawable();
-                    shapedrawable.setShape(new RectShape());
-                    shapedrawable.getPaint().setColor(Color.parseColor("#045D56"));
-                    shapedrawable.getPaint().setStrokeWidth(0.2f);
-                    shapedrawable.getPaint().setStyle(Paint.Style.STROKE);
-                    btnFollow.setBackground(shapedrawable);
-                    btnFollow.setBackgroundColor(Color.parseColor("#045D56"));
+                    btnFollow.setBackgroundColor(Color.parseColor("#1EB980"));
+                    btnFollow.setStrokeWidth(0);
                     btnFollow.setText("+ Theo dõi");
                     parentActivity.unfollowEvent(currentEvent);
                 }

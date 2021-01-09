@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -14,19 +16,33 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.example.android.vfund.R;
+import com.example.android.vfund.controller.QueryUtils;
 import com.example.android.vfund.model.FundraisingEvent;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class DonateActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FundraisingEvent mEvent;
     private Button btnDonate;
     private TextInputLayout txtMoney;
+
+    private static final String DONATE_REQUEST = "http://10.0.2.2:8080/api/events/patchevent/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +90,39 @@ public class DonateActivity extends AppCompatActivity implements View.OnClickLis
             intent.putExtras(bundle);
             setResult(RESULT_OK, intent);
 
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            Handler donateHandler = new Handler(Looper.getMainLooper());
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    boolean isRequest = false;
+                    StringBuilder request = new StringBuilder();
+                    request.append(DONATE_REQUEST).append("E").append(mEvent.get_eventID());
+                    URL requestUrl = QueryUtils.createUrl(request.toString());
+                    try {
+                        isRequest = QueryUtils.makeHttpRequestUpdateEvent(requestUrl, (int)mEvent.get_currentGain());
+                    } catch (IOException e) {
+                        Log.e("LOZ", "LOZ");
+                        e.printStackTrace();
+                    }
+                    if(isRequest) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Donate Successfully", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                    else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Donate Failed", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            });
             Toast.makeText(this, "Donate Successfully", Toast.LENGTH_SHORT).show();
             finish();
         }
