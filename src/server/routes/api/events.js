@@ -2,6 +2,8 @@ const express = require('express');
 var serviceAccount = require("../../server-key.json");
 const sql = require("mssql/msnodesqlv8");
 
+var jsonParser = express.json();
+
 var router = express.Router();
 
 const conn = new sql.ConnectionPool({
@@ -14,6 +16,13 @@ const conn = new sql.ConnectionPool({
     },
     port: 8883
 });
+
+
+router.param('eventId', function (req, res, next, id) {
+    console.log(id);
+    next()
+  })
+
 
 // connect to database
 conn.connect().then(() => {
@@ -39,6 +48,24 @@ router.get('/getevent', function (req, res) {
         else
             queryString += `AND ${key} = '${req.query[key]}'`;
     }
+    queryString += ` LEFT JOIN UserAccount ON UserAccount.IDandPrefix = Event.HostID`;
+
+    conn.query(queryString)
+        .then(result => {
+            res.send(result);
+        }).catch(err => {
+            // ... error checks
+            if (err) {
+                console.error('Error !!!');
+                throw err
+            }
+        });
+});
+
+router.get('/getfollowusers/:eventId', function (req, res) {
+    const eventId = req.params.eventId;
+    var queryString = `select * from Follow INNER JOIN UserAccount ON UserAccount.IDandPrefix = Follow.UserID
+    WHERE Follow.EventID = '${eventId}';`
 
     conn.query(queryString)
         .then(result => {
@@ -53,24 +80,33 @@ router.get('/getevent', function (req, res) {
 });
 
 router.post('/createevent', (req, res) => {
-    var EventName = req.body.EventName,
-        EventDescription = req.body.EventDescription,
-     EventDate = req.body.EventDate,
-     EventGoal = req.body.EventGoal,
-     EventRate = req.body.EventRate;
+    var queryString = "INSERT INTO Event ";
+    var cols,values;
+    cols="(";
+    values ="(";
+    var second = false;
 
-    var event = {
-        StringPrefix: 'E', EventName: EventName,
-        EventDescription: EventDescription,
-        EventDate: EventDate,
-        EventGoal: EventGoal,
-        EventRate: EventRate
+    for (const [key, value] of Object.entries(req.body)) {
+        if(!second){
+            cols += `${key}`;
+            values += `${value}`;
+            second=true;
+        }
+        else{
+            cols += `,${key}`;
+            values += `,${value}`;
+        } 
+
     }
+    cols+=')';
+    values+=')';
+
+    queryString+=cols+" VALUES "+values;
+    console.log(queryString)
 
     var transaction = new sql.Transaction(conn);
     transaction.begin().then(function () {
-        conn.query(`INSERT INTO Event(StringPrefix,EventName,EventDescription,EventDate,EventGoal,EventRate) 
-        VALUES ('${event.ID}','${event.EventName}','${event.EventDescription}','${event.EventDate}','${event.EventGoal}','${event.EventRate}')`)
+        conn.query(queryString)
             .then(function () {
                 transaction.commit().then(function (recordSet) {
                     console.log(recordSet);
@@ -83,6 +119,36 @@ router.post('/createevent', (req, res) => {
                 });
             });
     });
+});
+
+
+router.patch('/patchevent/:eventId', jsonParser, (req, res) => {
+    const eventId = req.params.eventId;
+
+    var queryString = "UPDATE Event ";
+    var second = false;
+
+    for (const [key, value] of Object.entries(req.body)) {
+        if (!second) {
+            queryString += `SET ${key} = '${value}'`;
+            second = true;
+        }
+        else
+            queryString += `, ${key} = '${value}'`;
+    }
+    queryString+=" WHERE IDandPrefix = '" + eventId + "';"
+    console.log(queryString)
+
+    conn.query(queryString, function(err,data){
+        var result = {};
+        if (err) {
+            conn.release();
+        } else {
+            conn.release();
+            result = data;
+        }
+    });
+    res.end()
 });
 
 module.exports = router;
