@@ -82,7 +82,7 @@ router.get('/getfollowevents/:userId', function (req, res) {
                 var hostQuery = `Select * from UserAccount Where IDandPrefix = '${jsonResult.users.recordset[j].HostID}'`
                 conn.query(hostQuery)
                     .then(result => {
-                        jsonResult.users.recordset[j].HostID = result.recordset;
+                        jsonResult.users.recordset[j].HostID = result.recordset[0];
                         j++;
                         if (j == jsonResult.users.recordset.length) {
                             res.send(jsonResult);
