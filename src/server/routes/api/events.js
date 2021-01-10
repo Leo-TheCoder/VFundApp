@@ -64,8 +64,10 @@ router.get('/getevent', function (req, res) {
 
 router.get('/getfollowusers/:eventId', function (req, res) {
     const eventId = req.params.eventId;
-    var queryString = `select * from Follow INNER JOIN UserAccount ON UserAccount.IDandPrefix = Follow.UserID
+    var queryString = `select * from Follow 
+    INNER JOIN UserAccount ON UserAccount.IDandPrefix = Follow.UserID
     WHERE Follow.EventID = '${eventId}';`
+    
 
     conn.query(queryString)
         .then(result => {
