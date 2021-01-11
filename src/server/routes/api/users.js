@@ -31,7 +31,7 @@ router.get('/', function (req, res) {
 router.param('userId', function (req, res, next, id) {
     console.log(id);
     next()
-  })
+})
 
 //query table UserAccount
 router.get('/getuser', function (req, res) {
@@ -50,7 +50,10 @@ router.get('/getuser', function (req, res) {
 
     conn.query(queryString)
         .then(result => {
-            res.send(result);
+            res.send({
+                'title': 'The queried user',
+                'result': result
+            });
         }).catch(err => {
             // ... error checks
             if (err) {
@@ -63,12 +66,36 @@ router.get('/getuser', function (req, res) {
 //get followed event
 router.get('/getfollowevents/:userId', function (req, res) {
     const userId = req.params.userId;
-    var queryString = `select * from Follow INNER JOIN Event ON Event.IDandPrefix = Follow.EventID
+    var queryString = `select * 
+    from Follow 
+    INNER JOIN Event ON Event.IDandPrefix = Follow.EventID
     WHERE Follow.UserID = '${userId}';`
+
+    var jsonResult = { 'title': 'The queried events' };
 
     conn.query(queryString)
         .then(result => {
-            res.send(result);
+            jsonResult.users = result;
+
+            var j = 0;
+            for (i in Object.entries(jsonResult.users.recordset)) {
+                var hostQuery = `Select * from UserAccount Where IDandPrefix = '${jsonResult.users.recordset[j].HostID}'`
+                conn.query(hostQuery)
+                    .then(result => {
+                        jsonResult.users.recordset[j].HostID = result.recordset[0];
+                        j++;
+                        if (j == jsonResult.users.recordset.length) {
+                            res.send(jsonResult);
+                        }
+                    }).catch(err => {
+                        // ... error checks
+                        if (err) {
+                            console.error('Error !!!');
+                            throw err
+                        }
+                    });
+
+            }
         }).catch(err => {
             // ... error checks
             if (err) {
@@ -82,27 +109,27 @@ router.get('/getfollowevents/:userId', function (req, res) {
 router.post('/createuser', jsonParser, (req, res) => {
     console.log(req.body);
     var queryString = "INSERT INTO UserAccount ";
-    var cols,values;
-    cols="(";
-    values ="(";
+    var cols, values;
+    cols = "(";
+    values = "(";
     var second = false;
 
     for (const [key, value] of Object.entries(req.body)) {
-        if(!second){
+        if (!second) {
             cols += `${key}`;
             values += `${value}`;
-            second=true;
+            second = true;
         }
-        else{
+        else {
             cols += `,${key}`;
             values += `,${value}`;
-        } 
+        }
 
     }
-    cols+=')';
-    values+=')';
+    cols += ')';
+    values += ')';
 
-    queryString+=cols+" VALUES "+values;
+    queryString += cols + " VALUES " + values;
     console.log(queryString)
 
     var transaction = new sql.Transaction(conn);
@@ -136,10 +163,10 @@ router.patch('/patchuser/:userId', jsonParser, (req, res) => {
         else
             queryString += `, ${key} = '${value}'`;
     }
-    queryString+=" WHERE IDandPrefix = '" + userId + "';"
+    queryString += " WHERE IDandPrefix = '" + userId + "';"
     console.log(queryString)
 
-    conn.query(queryString, function(err,data){
+    conn.query(queryString, function (err, data) {
         var result = {};
         if (err) {
             conn.release();
