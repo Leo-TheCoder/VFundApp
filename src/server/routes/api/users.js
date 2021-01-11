@@ -81,7 +81,6 @@ router.post('/follow',(req,res)=>{
         conn.query(queryString)
             .then(function () {
                 transaction.commit().then(function (recordSet) {
-                    conn.close();
                     return res.send('Inserted successfully');
                 }).catch(function (err) {
                     console.log("Error in Transaction Commit " + err);
@@ -108,7 +107,6 @@ router.delete('/follow', jsonParser, (req, res) => {
             .then(function () {
                 transaction.commit().then(function (recordSet) {
                     console.log(recordSet);
-                    conn.close();
                     return res.send('Delete successfully');
                 }).catch(function (err) {
                     console.log("Error in Transaction Commit " + err);
@@ -179,7 +177,6 @@ router.post('/createuser', jsonParser, (req, res) => {
             .then(function () {
                 transaction.commit().then(function (recordSet) {
                     console.log(recordSet);
-                    conn.close();
                     return res.send('Inserted successfully');
                 }).catch(function (err) {
                     console.log("Error in Transaction Commit " + err);

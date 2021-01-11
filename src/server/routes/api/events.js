@@ -128,7 +128,6 @@ router.post('/createevent', (req, res) => {
             .then(function () {
                 transaction.commit().then(function (recordSet) {
                     console.log(recordSet);
-                    conn.close();
                     return res.send('Inserted successfully');
                 }).catch(function (err) {
                     console.log("Error in Transaction Commit " + err);
