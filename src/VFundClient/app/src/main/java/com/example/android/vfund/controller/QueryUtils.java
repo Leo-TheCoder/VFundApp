@@ -252,7 +252,7 @@ public final class QueryUtils {
         // Catch the exception so the app doesn't crash, and print the error message to the logs.
         try {
             JSONObject root = new JSONObject(jsonResponse);
-            root = root.getJSONObject("users");
+            root = root.getJSONObject("result");
             JSONArray events = root.getJSONArray("recordset");
 
             for(int i = 0; events.getJSONObject(i) != null; i++) {
@@ -267,52 +267,6 @@ public final class QueryUtils {
                         hostJSON.getString("UserEmail"), hostJSON.getString("UserDOB"),
                         hostJSON.getString("UserPhoneNumber"));
                 
-                newEvent.set_owner(host);
-                eventList.add(newEvent);
-
-            }
-            // TODO: Parse the response given by the SAMPLE_JSON_RESPONSE string and
-            // build up a User objects with the corresponding data.
-
-        } catch (JSONException e) {
-            // If an error is thrown when executing any of the above statements in the "try" block,
-            // catch the exception here, so the app doesn't crash. Print a log message
-            // with the message from the exception.
-            Log.e("QueryUtils", "Problem parsing the event JSON results");
-        }
-
-        // Return the user
-        return eventList;
-    }
-
-    /**
-     * Return a list of {@link FundraisingEvent} objects that has been built up from
-     * parsing a JSON response.
-     */
-    public static ArrayList<FundraisingEvent> extractFollowEventList(String jsonResponse) {
-
-        ArrayList<FundraisingEvent> eventList = new ArrayList<FundraisingEvent>();
-        // Try to parse the SAMPLE_JSON_RESPONSE. If there's a problem with the way the JSON
-        // is formatted, a JSONException exception object will be thrown.
-        // Catch the exception so the app doesn't crash, and print the error message to the logs.
-        try {
-            JSONObject root = new JSONObject(jsonResponse);
-            JSONArray events = root.getJSONArray("recordset");
-
-            for(int i = 0; events.getJSONObject(i) != null; i++) {
-                JSONObject event = events.getJSONObject(i);
-
-                JSONArray idJSON = event.getJSONArray("ID");
-                int id = idJSON.getInt(0);
-
-                int hostEventId = parseIdFromPrefix(event.getString("HostID"));
-
-                User host = new User(hostEventId, event.getString("Username"),
-                        event.getString("UserEmail"), event.getString("UserDOB"),
-                        event.getString("UserPhoneNumber"));
-                FundraisingEvent newEvent = new FundraisingEvent(id, event.getString("EventName"),
-                        event.getString("EventDescription"),event.getString("EventDate"),false,
-                        event.getInt("EventGoal"), event.getInt("CurrentMoney"));
                 newEvent.set_owner(host);
                 eventList.add(newEvent);
 
@@ -346,5 +300,85 @@ public final class QueryUtils {
         return  Integer.parseInt(idStr);
     }
 
+    /**
+     * Make an HTTP request to the given URL and update event with current money
+     */
+    public static boolean makeHttpRequestFollowEvent(URL url) throws IOException {
+        String jsonResponse = "";
 
+        // If the URL is null, then return early.
+        if (url == null) {
+            return false;
+        }
+
+        HttpURLConnection urlConnection = null;
+        InputStream inputStream = null;
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setReadTimeout(10000 /* milliseconds */);
+            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setRequestMethod("POST");
+            urlConnection.connect();
+
+            Log.i("MSG" , urlConnection.getResponseMessage());
+            // If the request was successful (response code 200),
+            // then read the input stream and parse the response.
+            if (urlConnection.getResponseCode() == 200) {
+                Log.e(LOG_TAG, "Successfully request");
+            } else {
+                Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Problem retrieving the user JSON results.", e);
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Make an HTTP request to the given URL and update event with current money
+     */
+    public static boolean makeHttpRequestUnFollowEvent(URL url) throws IOException {
+        String jsonResponse = "";
+
+        // If the URL is null, then return early.
+        if (url == null) {
+            return false;
+        }
+
+        HttpURLConnection urlConnection = null;
+        InputStream inputStream = null;
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setReadTimeout(10000 /* milliseconds */);
+            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setRequestMethod("DELETE");
+            urlConnection.connect();
+
+            Log.i("MSG" , urlConnection.getResponseMessage());
+            // If the request was successful (response code 200),
+            // then read the input stream and parse the response.
+            if (urlConnection.getResponseCode() == 200) {
+                Log.e(LOG_TAG, "Successfully request");
+            } else {
+                Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Problem retrieving the user JSON results.", e);
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        }
+        return true;
+    }
 }

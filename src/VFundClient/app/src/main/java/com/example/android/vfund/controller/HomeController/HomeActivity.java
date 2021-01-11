@@ -11,9 +11,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.media.Image;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -33,7 +31,11 @@ import com.example.android.vfund.model.User;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HomeActivity extends AppCompatActivity implements EventCallBack, LoaderManager.LoaderCallbacks<ArrayList<ArrayList<FundraisingEvent>>> {
 
@@ -54,11 +56,13 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
     private int numOfTab = 5;
 
     private static final String EVENT_REQUEST_URL = "http://10.0.2.2:8080/api/events/getevent";
-    private static final String EVENT_FOLLOW_REQUEST_URL = "http://10.0.2.2:8080/api/users/getfollowevents/";
+    private static final String EVENT_GET_FOLLOW_REQUEST_URL = "http://10.0.2.2:8080/api/users/getfollowevents/";
+    private static final String EVENT_FOLLOW_REQUEST_URL = "http://10.0.2.2:8080/api/users/follow";
     private EventAdapter myEventAdapter;
     private EventAdapter myEventFollowedAdapter;
     private NotificationAdapter myNotifyAdapter;
     private EventBriefAdapter myEventBriefAdapter;
+    private User mLoginUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +71,7 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
 
         Intent callingIntent = getIntent();
         Bundle userBundle = callingIntent.getExtras();
-        User loginUser = userBundle.getParcelable("user");
+        mLoginUser = userBundle.getParcelable("user");
 
         txtAddEvent = (TextView)findViewById(R.id.txtAddEvent);
         viewPager = (ViewPager2)findViewById(R.id.viewpager);
@@ -75,7 +79,7 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
         txtAddEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent getToAddEvent = new Intent(getParent(), CreateEventActivity.class);
+                Intent getToAddEvent = new Intent(getApplicationContext(), CreateEventActivity.class);
                 startActivity(getToAddEvent);
             }
         });
@@ -89,7 +93,7 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
 
 
         StringBuilder followRequest = new StringBuilder();
-        followRequest.append(EVENT_FOLLOW_REQUEST_URL).append("US").append(String.valueOf(loginUser.get_id()));
+        followRequest.append(EVENT_GET_FOLLOW_REQUEST_URL).append("US").append(String.valueOf(mLoginUser.get_id()));
         Log.e("TEST", followRequest.toString());
         Bundle followRequestBundle = new Bundle();
         followRequestBundle.putString("eventList", followRequest.toString());
@@ -101,7 +105,7 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
         homeViewPagerAdapter.setEventFollowedAdapter(myEventFollowedAdapter);
         homeViewPagerAdapter.setNotifyAdapter(myNotifyAdapter);
         homeViewPagerAdapter.setEventBriefAdapter(myEventBriefAdapter);
-        homeViewPagerAdapter.setLoginUser(loginUser);
+        homeViewPagerAdapter.setLoginUser(mLoginUser);
         viewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         viewPager.setAdapter(homeViewPagerAdapter);
         viewPager.setOffscreenPageLimit(4);
@@ -127,13 +131,42 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
     }
 
     @Override
-    public void followEvent(FundraisingEvent event) {
+    public void followEvent(final FundraisingEvent event) {
         myEventFollowedAdapter.addEvent(event);
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                StringBuilder requestFollow = new StringBuilder(EVENT_FOLLOW_REQUEST_URL);
+                requestFollow.append("?UserID=US").append(mLoginUser.get_id()).append("&EventID=E").append(event.get_eventID());
+                URL request = QueryUtils.createUrl(requestFollow.toString());
+                try {
+                    QueryUtils.makeHttpRequestFollowEvent(request);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
-    public void unfollowEvent(FundraisingEvent event) {
+    public void unfollowEvent(final FundraisingEvent event) {
         myEventFollowedAdapter.removeEvent(event);
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                StringBuilder requestFollow = new StringBuilder(EVENT_FOLLOW_REQUEST_URL);
+                requestFollow.append("?UserID=US").append(mLoginUser.get_id()).append("&EventID=E").append(event.get_eventID());
+                URL request = QueryUtils.createUrl(requestFollow.toString());
+                try {
+                    QueryUtils.makeHttpRequestUnFollowEvent(request);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override

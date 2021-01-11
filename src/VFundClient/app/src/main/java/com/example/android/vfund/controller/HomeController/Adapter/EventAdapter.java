@@ -108,12 +108,10 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
     }
 
     public void removeEvent(FundraisingEvent event) {
-        for(int i = 0; i < _eventList.size(); i++) {
-            if(_eventList.get(i).get_eventID() == event.get_eventID()) {
-                _eventList.remove(i);
-                submitList(_eventList);
-                notifyDataSetChanged();
-            }
+        int index = searchEvent(event.get_eventID());
+        if(index >= 0) {
+            _eventList.remove(index);
+            notifyItemRemoved(index);
         }
     }
 
