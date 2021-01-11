@@ -222,7 +222,7 @@ public final class QueryUtils {
         return thisUser;
     }
 
-    public static ArrayList<FundraisingEvent> fetchEventData(String requestUrl) {
+    public static ArrayList<FundraisingEvent> fetchEventData(String requestUrl, boolean isFollowed) {
         //Create URL object
         URL url = createUrl(requestUrl);
 
@@ -235,7 +235,7 @@ public final class QueryUtils {
         }
 
         //Extract relevant fields from the JSON response and create an {@link User} object
-        ArrayList<FundraisingEvent> eventList = extractEventList(jsonResponse);
+        ArrayList<FundraisingEvent> eventList = extractEventList(jsonResponse, isFollowed);
 
         return eventList;
     }
@@ -244,7 +244,7 @@ public final class QueryUtils {
      * Return a list of {@link FundraisingEvent} objects that has been built up from
      * parsing a JSON response.
      */
-    public static ArrayList<FundraisingEvent> extractEventList(String jsonResponse) {
+    public static ArrayList<FundraisingEvent> extractEventList(String jsonResponse, boolean isFollowed) {
 
         ArrayList<FundraisingEvent> eventList = new ArrayList<FundraisingEvent>();
         // Try to parse the SAMPLE_JSON_RESPONSE. If there's a problem with the way the JSON
@@ -259,7 +259,7 @@ public final class QueryUtils {
                 JSONObject event = events.getJSONObject(i);
 
                 FundraisingEvent newEvent = new FundraisingEvent(event.getInt("ID"), event.getString("EventName"),
-                        event.getString("EventDescription"),event.getString("EventDate"),false,
+                        event.getString("EventDescription"),event.getString("EventDate"),isFollowed,
                         event.getInt("EventGoal"), event.getInt("CurrentMoney"));
 
                 JSONObject hostJSON = event.getJSONObject("HostID");

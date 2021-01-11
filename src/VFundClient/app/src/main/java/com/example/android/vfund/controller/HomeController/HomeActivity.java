@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.vfund.CreateEventActivity;
 import com.example.android.vfund.R;
 import com.example.android.vfund.controller.HomeController.Adapter.EventAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.EventBriefAdapter;
@@ -34,7 +35,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 
-public class HomeActivity extends AppCompatActivity implements EventCallBack, LoaderManager.LoaderCallbacks<ArrayList<FundraisingEvent>> {
+public class HomeActivity extends AppCompatActivity implements EventCallBack, LoaderManager.LoaderCallbacks<ArrayList<ArrayList<FundraisingEvent>>> {
 
     ViewPager2 viewPager;
     TextView txtAddEvent;
@@ -48,7 +49,6 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
             R.drawable.explore_icon_selected, R.drawable.notify_icon_selected, R.drawable.account_icon_selected};
     public static final int REQUEST_DONATED_CODE = 1;
     private final int ID_FETCH_EVENT_LOADER = 1;
-    private final int ID_FETCH_FOLLOW_LOADER = 2;
 
     private HomeViewPagerAdapter homeViewPagerAdapter;
     private int numOfTab = 5;
@@ -72,6 +72,13 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
         txtAddEvent = (TextView)findViewById(R.id.txtAddEvent);
         viewPager = (ViewPager2)findViewById(R.id.viewpager);
         progressHome = (ProgressBar)findViewById(R.id.progressHome);
+        txtAddEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent getToAddEvent = new Intent(getParent(), CreateEventActivity.class);
+                startActivity(getToAddEvent);
+            }
+        });
 
         homeViewPagerAdapter = new HomeViewPagerAdapter(this);
 
@@ -80,12 +87,13 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
         myNotifyAdapter = new NotificationAdapter();
         myEventBriefAdapter = new EventBriefAdapter();
 
-        LoaderManager.getInstance(this).initLoader(ID_FETCH_EVENT_LOADER, null, this);
+
         StringBuilder followRequest = new StringBuilder();
         followRequest.append(EVENT_FOLLOW_REQUEST_URL).append("US").append(String.valueOf(loginUser.get_id()));
+        Log.e("TEST", followRequest.toString());
         Bundle followRequestBundle = new Bundle();
         followRequestBundle.putString("eventList", followRequest.toString());
-        LoaderManager.getInstance(this).initLoader(ID_FETCH_FOLLOW_LOADER, followRequestBundle, this);
+        LoaderManager.getInstance(this).initLoader(ID_FETCH_EVENT_LOADER, followRequestBundle, this);
 
         homeViewPagerAdapter.setNumOfTab(numOfTab);
 
@@ -179,56 +187,32 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
 
     @NonNull
     @Override
-    public Loader<ArrayList<FundraisingEvent>> onCreateLoader(int id, @Nullable Bundle args) {
-
+    public Loader<ArrayList<ArrayList<FundraisingEvent>>> onCreateLoader(int id, @Nullable Bundle args) {
+        String requestFollow = args.getString("eventList");
         progressHome.setVisibility(View.VISIBLE);
-        if(id == ID_FETCH_EVENT_LOADER) {
-            return new EventAsyncTaskLoader(this, EVENT_REQUEST_URL);
-        }
-        else {
-            String requestFollow = args.getString("eventList");
-            return new FollowEventAsyncTaskLoader(this, requestFollow);
-        }
-
+        return new EventAsyncTaskLoader(this, EVENT_REQUEST_URL, requestFollow);
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<ArrayList<FundraisingEvent>> loader, ArrayList<FundraisingEvent> data) {
-        switch (loader.getId()) {
-            case ID_FETCH_EVENT_LOADER:
-                progressHome.setVisibility(View.GONE);
-                myEventAdapter.submitList(data);
-                break;
-            case ID_FETCH_FOLLOW_LOADER:
-                progressHome.setVisibility(View.GONE);
-                myEventFollowedAdapter.submitList(data);
-                break;
-            default:
-                break;
-        }
-
+    public void onLoadFinished(@NonNull Loader<ArrayList<ArrayList<FundraisingEvent>>> loader, ArrayList<ArrayList<FundraisingEvent>> data) {
+        progressHome.setVisibility(View.GONE);
+        myEventAdapter.updateEvent(data.get(0));
+        myEventFollowedAdapter.updateEvent(data.get(1));
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<ArrayList<FundraisingEvent>> loader) {
-        switch (loader.getId()) {
-            case ID_FETCH_EVENT_LOADER:
-                myEventAdapter.submitList(null);
-                break;
-            case ID_FETCH_FOLLOW_LOADER:
-                myEventFollowedAdapter.submitList(null);
-                break;
-            default:
-                break;
-        }
-
+    public void onLoaderReset(@NonNull Loader<ArrayList<ArrayList<FundraisingEvent>>> loader) {
+        myEventAdapter.submitList(null);
+        myEventFollowedAdapter.submitList(null);
     }
 
-    private static class EventAsyncTaskLoader extends AsyncTaskLoader<ArrayList<FundraisingEvent>>{
-        private String mURL = null;
-        public EventAsyncTaskLoader(@NonNull Context context, String url) {
+    private static class EventAsyncTaskLoader extends AsyncTaskLoader<ArrayList<ArrayList<FundraisingEvent>>>{
+        private String mUrlAll = null;
+        private String mUrlFollow = null;
+        public EventAsyncTaskLoader(@NonNull Context context, String urlAll, String urlFollow) {
             super(context);
-            mURL = url;
+            mUrlAll = urlAll;
+            mUrlFollow = urlFollow;
         }
 
         @Override
@@ -239,36 +223,30 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
 
         @Nullable
         @Override
-        public ArrayList<FundraisingEvent> loadInBackground() {
-            if(mURL == null) {
+        public ArrayList<ArrayList<FundraisingEvent>> loadInBackground() {
+            if(mUrlAll == null || mUrlFollow == null) {
                 return null;
             }
-            ArrayList<FundraisingEvent> eventList = QueryUtils.fetchEventData(mURL);
-            return eventList;
-        }
-    }
 
-    private static class FollowEventAsyncTaskLoader extends AsyncTaskLoader<ArrayList<FundraisingEvent>> {
-        private String mURL = null;
-        public FollowEventAsyncTaskLoader(@NonNull Context context, String url) {
-            super(context);
-            mURL = url;
-        }
+            ArrayList<ArrayList<FundraisingEvent>> eventLists = new ArrayList<ArrayList<FundraisingEvent>>();
+            ArrayList<FundraisingEvent> eventList = QueryUtils.fetchEventData(mUrlAll, false);
+            ArrayList<FundraisingEvent> eventFollowList = QueryUtils.fetchEventData(mUrlFollow, true);
 
-        @Override
-        protected void onForceLoad() {
-            super.onForceLoad();
-            forceLoad();
-        }
-
-        @Nullable
-        @Override
-        public ArrayList<FundraisingEvent> loadInBackground() {
-            if(mURL == null) {
-                return null;
+            for(int i = 0; i < eventFollowList.size(); i++) {
+                FundraisingEvent event = eventFollowList.get(i);
+                for(int j = 0; j < eventList.size(); j++) {
+                    FundraisingEvent tmpEvent = eventList.get(j);
+                    if(tmpEvent.get_eventID() == event.get_eventID()) {
+                        eventList.get(j).set_isFollowed(true);
+                        break;
+                    }
+                }
             }
-            ArrayList<FundraisingEvent> eventList = QueryUtils.fetchEventData(mURL);
-            return eventList;
+
+            eventLists.add(eventList);
+            eventLists.add(eventFollowList);
+
+            return eventLists;
         }
     }
 }

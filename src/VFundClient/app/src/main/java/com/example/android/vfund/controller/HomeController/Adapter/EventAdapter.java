@@ -108,10 +108,13 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
     }
 
     public void removeEvent(FundraisingEvent event) {
-        if(_eventList.remove(event)){
-            submitList(_eventList);
-            notifyDataSetChanged();
-        };
+        for(int i = 0; i < _eventList.size(); i++) {
+            if(_eventList.get(i).get_eventID() == event.get_eventID()) {
+                _eventList.remove(i);
+                submitList(_eventList);
+                notifyDataSetChanged();
+            }
+        }
     }
 
     private int searchEvent(int eventID) {
@@ -133,6 +136,11 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
         }
     }
 
+    public void updateEvent(ArrayList<FundraisingEvent> eventList) {
+        submitList(eventList);
+        _eventList = eventList;
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -146,7 +154,7 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         final FundraisingEvent currentEvent = getItem(position);
 
         holder.progressEvent.setMax(Math.round(currentEvent.get_eventGoal()));
@@ -168,23 +176,17 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
         holder.txtProgressEvent.setText(currentEvent.getStringPercentage());
 
         final MaterialButton btnFollow = holder.btnFollow;
+        setUpButtonFollow(currentEvent, btnFollow);
         btnFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("Clicke", "test");
                 boolean isFollow = currentEvent.is_Followed();
                 currentEvent.set_isFollowed(!isFollow);
-                if(!isFollow == true) {
-                    btnFollow.setBackgroundColor(Color.parseColor("#055659"));
-                    btnFollow.setText("Đã theo dõi");
-                    btnFollow.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#1EB980")));
-                    btnFollow.setStrokeWidth(1);
+                setUpButtonFollow(currentEvent, btnFollow);
+                if(currentEvent.is_Followed()) {
                     parentActivity.followEvent(currentEvent);
                 }
                 else {
-                    btnFollow.setBackgroundColor(Color.parseColor("#1EB980"));
-                    btnFollow.setStrokeWidth(0);
-                    btnFollow.setText("+ Theo dõi");
                     parentActivity.unfollowEvent(currentEvent);
                 }
             }
@@ -200,6 +202,21 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
             }
         });
 
+    }
+
+    private void setUpButtonFollow(FundraisingEvent currentEvent, MaterialButton btnFollow) {
+        boolean isFollow = currentEvent.is_Followed();
+        if(isFollow) {
+            btnFollow.setBackgroundColor(Color.parseColor("#055659"));
+            btnFollow.setText("Đã theo dõi");
+            btnFollow.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#1EB980")));
+            btnFollow.setStrokeWidth(1);
+        }
+        else {
+            btnFollow.setBackgroundColor(Color.parseColor("#1EB980"));
+            btnFollow.setStrokeWidth(0);
+            btnFollow.setText("+ Theo dõi");
+        }
     }
 
     public static final DiffUtil.ItemCallback<FundraisingEvent> DIFF_CALLBACK =
