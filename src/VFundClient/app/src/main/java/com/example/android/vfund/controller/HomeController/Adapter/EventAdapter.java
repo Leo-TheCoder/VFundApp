@@ -1,8 +1,16 @@
 package com.example.android.vfund.controller.HomeController.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
+
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +20,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,6 +31,9 @@ import com.example.android.vfund.controller.EventDetailController.Adapter.EventD
 import com.example.android.vfund.controller.EventDetailController.EventDetailActivity;
 import com.example.android.vfund.controller.HomeController.HomeActivity;
 import com.example.android.vfund.model.FundraisingEvent;
+import com.example.android.vfund.model.User;
+import com.google.android.material.button.MaterialButton;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,23 +44,27 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public Button btnFollow;
+        public MaterialButton btnFollow;
         private ItemClickListener itemClickListener;
         public TextView txtDescriptionEvent;
         public TextView txtProgressEvent;
         public TextView txtMoneyGoalEvent;
         public TextView txtDayLeft;
         public ProgressBar progressEvent;
+        public TextView txtNameOwner;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            btnFollow = (Button)itemView.findViewById(R.id.btnFollowEvent);
+
             txtDescriptionEvent = (TextView)itemView.findViewById(R.id.txtDescriptionEvent);
             txtProgressEvent = (TextView)itemView.findViewById(R.id.txtProgressEvent);
             txtMoneyGoalEvent = (TextView)itemView.findViewById(R.id.txtMoneyGoalEvent);
             txtDayLeft = (TextView)itemView.findViewById(R.id.txtDayLeft);
             progressEvent = (ProgressBar)itemView.findViewById(R.id.progressEvent);
+            txtNameOwner = (TextView)itemView.findViewById(R.id.txtNameOwner);
+            btnFollow = (MaterialButton)itemView.findViewById(R.id.btnFollowEvent);
+
 
             if(isFollowed) {
                 btnFollow.setVisibility(View.GONE);
@@ -73,11 +89,11 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
         super(DIFF_CALLBACK);
         parentActivity = activity;
         _eventList = new ArrayList<FundraisingEvent>();
-        for(int i = 0; i < 4; i++) {
-            FundraisingEvent myTestEvent = new FundraisingEvent(i,"Tiêm thử vaccin x" + i , "Event description",
-                    "2021-06-18T00:00:00.000Z", false, 1234567);
-            _eventList.add(myTestEvent);
-        }
+//        for(int i = 0; i < 4; i++) {
+//            FundraisingEvent myTestEvent = new FundraisingEvent(i,"Tiêm thử vaccin x" + i , "Event description",
+//                    "2021-06-18T00:00:00.000Z", false, 1234567, 0);
+//            _eventList.add(myTestEvent);
+//        }
         submitList(_eventList);
     }
 
@@ -93,8 +109,8 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
 
     public void removeEvent(FundraisingEvent event) {
         if(_eventList.remove(event)){
-            submitList(null);
             submitList(_eventList);
+            notifyDataSetChanged();
         };
     }
 
@@ -145,9 +161,13 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
 
         holder.txtMoneyGoalEvent.setText(currentEvent.getStringGoalFormat());
         holder.txtDayLeft.setText(String.valueOf(currentEvent.get_timeRemain()));
-
+        User owner = currentEvent.get_owner();
+        if(owner != null) {
+            holder.txtNameOwner.setText(owner.get_name());
+        }
         holder.txtProgressEvent.setText(currentEvent.getStringPercentage());
-        final Button btnFollow = holder.btnFollow;
+
+        final MaterialButton btnFollow = holder.btnFollow;
         btnFollow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,12 +175,15 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
                 boolean isFollow = currentEvent.is_Followed();
                 currentEvent.set_isFollowed(!isFollow);
                 if(!isFollow == true) {
-                    btnFollow.setBackgroundResource(R.drawable.custom_button_follow_checked);
+                    btnFollow.setBackgroundColor(Color.parseColor("#055659"));
                     btnFollow.setText("Đã theo dõi");
+                    btnFollow.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#1EB980")));
+                    btnFollow.setStrokeWidth(1);
                     parentActivity.followEvent(currentEvent);
                 }
                 else {
-                    btnFollow.setBackgroundResource(R.drawable.custom_button_follow);
+                    btnFollow.setBackgroundColor(Color.parseColor("#1EB980"));
+                    btnFollow.setStrokeWidth(0);
                     btnFollow.setText("+ Theo dõi");
                     parentActivity.unfollowEvent(currentEvent);
                 }

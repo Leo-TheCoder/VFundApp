@@ -15,8 +15,10 @@
     <color name="colorSecondaryGreen">#045D56</color>
     <color name="colorBackground">#131C19</color>
     <color name="editTextColor">#88b5b0</color>
+    <color name="colorBackgroundElevated">#2F3735</color>
 
-
+    <color name="textColorSecondary">#71b38e</color>
 
     <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
 </resources>

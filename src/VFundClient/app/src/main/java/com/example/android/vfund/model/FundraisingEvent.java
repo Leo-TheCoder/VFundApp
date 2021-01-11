@@ -17,12 +17,13 @@ public class FundraisingEvent implements Parcelable {
     private float _eventRate;
     private boolean _isFollowed;
     private float _currentGain;
-    private User _owner;
+    private User _owner = null;
 
     private static SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     public FundraisingEvent(){}
 
-    public FundraisingEvent(int id, String name, String description, String deadline, boolean isFollowed, float goal){
+    public FundraisingEvent(int id, String name, String description,
+                            String deadline, boolean isFollowed, float goal, float currentGain){
         _eventID = id;
         _eventName = name;
         _eventDescription = description;
@@ -37,7 +38,7 @@ public class FundraisingEvent implements Parcelable {
         }
         _isFollowed =  isFollowed;
         _eventGoal = goal;
-        _currentGain = 99999;
+        _currentGain = currentGain;
     }
 
     protected FundraisingEvent(Parcel in) {
@@ -119,6 +120,14 @@ public class FundraisingEvent implements Parcelable {
             result.insert(i, ',');
         }
         return result.toString();
+    }
+
+    public User get_owner() {
+        return _owner;
+    }
+
+    public void set_owner(User _owner) {
+        this._owner = _owner;
     }
 
     public String getStringPercentage() {

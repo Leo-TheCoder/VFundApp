@@ -3,9 +3,12 @@ package com.example.android.vfund.controller.HomeController;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
 import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.Image;
@@ -14,6 +17,7 @@ import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,15 +26,19 @@ import com.example.android.vfund.controller.HomeController.Adapter.EventAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.EventBriefAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.HomeViewPagerAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.NotificationAdapter;
+import com.example.android.vfund.controller.QueryUtils;
 import com.example.android.vfund.model.FundraisingEvent;
 import com.example.android.vfund.model.User;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-public class HomeActivity extends AppCompatActivity implements EventCallBack {
+import java.util.ArrayList;
+
+public class HomeActivity extends AppCompatActivity implements EventCallBack, LoaderManager.LoaderCallbacks<ArrayList<FundraisingEvent>> {
 
     ViewPager2 viewPager;
     TextView txtAddEvent;
+    ProgressBar progressHome;
     private TextView txtCustomTab;
     private ImageView imgCustomTab;
     int[] customImagesTab = {R.drawable.home_icon, R.drawable.follow_icon,
@@ -39,10 +47,14 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
     int[] customImagesTabSelected = {R.drawable.home_icon_selected, R.drawable.follow_icon_selected,
             R.drawable.explore_icon_selected, R.drawable.notify_icon_selected, R.drawable.account_icon_selected};
     public static final int REQUEST_DONATED_CODE = 1;
+    private final int ID_FETCH_EVENT_LOADER = 1;
+    private final int ID_FETCH_FOLLOW_LOADER = 2;
 
     private HomeViewPagerAdapter homeViewPagerAdapter;
     private int numOfTab = 5;
 
+    private static final String EVENT_REQUEST_URL = "http://10.0.2.2:8080/api/events/getevent";
+    private static final String EVENT_FOLLOW_REQUEST_URL = "http://10.0.2.2:8080/api/users/getfollowevents/";
     private EventAdapter myEventAdapter;
     private EventAdapter myEventFollowedAdapter;
     private NotificationAdapter myNotifyAdapter;
@@ -59,6 +71,7 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
 
         txtAddEvent = (TextView)findViewById(R.id.txtAddEvent);
         viewPager = (ViewPager2)findViewById(R.id.viewpager);
+        progressHome = (ProgressBar)findViewById(R.id.progressHome);
 
         homeViewPagerAdapter = new HomeViewPagerAdapter(this);
 
@@ -66,6 +79,14 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
         myEventFollowedAdapter = new EventAdapter(this);
         myNotifyAdapter = new NotificationAdapter();
         myEventBriefAdapter = new EventBriefAdapter();
+
+        LoaderManager.getInstance(this).initLoader(ID_FETCH_EVENT_LOADER, null, this);
+        StringBuilder followRequest = new StringBuilder();
+        followRequest.append(EVENT_FOLLOW_REQUEST_URL).append("US").append(String.valueOf(loginUser.get_id()));
+        Bundle followRequestBundle = new Bundle();
+        followRequestBundle.putString("eventList", followRequest.toString());
+        LoaderManager.getInstance(this).initLoader(ID_FETCH_FOLLOW_LOADER, followRequestBundle, this);
+
         homeViewPagerAdapter.setNumOfTab(numOfTab);
 
         homeViewPagerAdapter.setEventAdapter(myEventAdapter);
@@ -73,7 +94,6 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
         homeViewPagerAdapter.setNotifyAdapter(myNotifyAdapter);
         homeViewPagerAdapter.setEventBriefAdapter(myEventBriefAdapter);
         homeViewPagerAdapter.setLoginUser(loginUser);
-
         viewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         viewPager.setAdapter(homeViewPagerAdapter);
         viewPager.setOffscreenPageLimit(4);
@@ -155,5 +175,100 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack {
                 }
             }
         });
+    }
+
+    @NonNull
+    @Override
+    public Loader<ArrayList<FundraisingEvent>> onCreateLoader(int id, @Nullable Bundle args) {
+
+        progressHome.setVisibility(View.VISIBLE);
+        if(id == ID_FETCH_EVENT_LOADER) {
+            return new EventAsyncTaskLoader(this, EVENT_REQUEST_URL);
+        }
+        else {
+            String requestFollow = args.getString("eventList");
+            return new FollowEventAsyncTaskLoader(this, requestFollow);
+        }
+
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<ArrayList<FundraisingEvent>> loader, ArrayList<FundraisingEvent> data) {
+        switch (loader.getId()) {
+            case ID_FETCH_EVENT_LOADER:
+                progressHome.setVisibility(View.GONE);
+                myEventAdapter.submitList(data);
+                break;
+            case ID_FETCH_FOLLOW_LOADER:
+                progressHome.setVisibility(View.GONE);
+                myEventFollowedAdapter.submitList(data);
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<ArrayList<FundraisingEvent>> loader) {
+        switch (loader.getId()) {
+            case ID_FETCH_EVENT_LOADER:
+                myEventAdapter.submitList(null);
+                break;
+            case ID_FETCH_FOLLOW_LOADER:
+                myEventFollowedAdapter.submitList(null);
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    private static class EventAsyncTaskLoader extends AsyncTaskLoader<ArrayList<FundraisingEvent>>{
+        private String mURL = null;
+        public EventAsyncTaskLoader(@NonNull Context context, String url) {
+            super(context);
+            mURL = url;
+        }
+
+        @Override
+        protected void onStartLoading() {
+            super.onStartLoading();
+            forceLoad();
+        }
+
+        @Nullable
+        @Override
+        public ArrayList<FundraisingEvent> loadInBackground() {
+            if(mURL == null) {
+                return null;
+            }
+            ArrayList<FundraisingEvent> eventList = QueryUtils.fetchEventData(mURL);
+            return eventList;
+        }
+    }
+
+    private static class FollowEventAsyncTaskLoader extends AsyncTaskLoader<ArrayList<FundraisingEvent>> {
+        private String mURL = null;
+        public FollowEventAsyncTaskLoader(@NonNull Context context, String url) {
+            super(context);
+            mURL = url;
+        }
+
+        @Override
+        protected void onForceLoad() {
+            super.onForceLoad();
+            forceLoad();
+        }
+
+        @Nullable
+        @Override
+        public ArrayList<FundraisingEvent> loadInBackground() {
+            if(mURL == null) {
+                return null;
+            }
+            ArrayList<FundraisingEvent> eventList = QueryUtils.fetchEventData(mURL);
+            return eventList;
+        }
     }
 }

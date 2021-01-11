@@ -5,4 +5,26 @@
     <string name="editName">Họ và tên</string>
     <string name="paymentmenu">Chọn hình thức thanh toán</string>
     <string name="cardNumber">Số thẻ</string>
+    <string name="title_activity_create_event">CreateEventActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="create_event_title">Tạo chiến dịch của bạn</string>
+    <string name="eventName">Tên chiến dịch</string>
+    <string name="eventStory">Kể câu chuyện của bạn</string>
+    <string name="eventMoneyAmount">Số tiền cần quyên góp</string>
+    <string name="categorymenu">Chọn danh mục</string>
+    <string name="addImage">Thêm ảnh</string>
+    <string name="title">Chèn ảnh tiêu đề</string>
+    <string name="secondary_text">Kích thước ảnh tối thiểu 900x900 px</string>
+    <string name="nextPage">Tiếp tục</string>
+    <string name="address">Địa chỉ</string>
+    <string name="phoneNumber">Số điện thoại</string>
+    <string name="bankmenu">Chọn ngân hàng</string>
+    <string name="complete">Hoàn tất</string>
 </resources>
