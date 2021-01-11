@@ -201,6 +201,7 @@ public final class QueryUtils {
         // Catch the exception so the app doesn't crash, and print the error message to the logs.
         try {
             JSONObject root = new JSONObject(jsonResponse);
+            root = root.getJSONObject("result");
             JSONArray featuresArray = root.getJSONArray("recordset");
             JSONObject properties = featuresArray.getJSONObject(0);
             thisUser = new User(properties.getInt("ID"), properties.getString("Username"),
@@ -251,22 +252,21 @@ public final class QueryUtils {
         // Catch the exception so the app doesn't crash, and print the error message to the logs.
         try {
             JSONObject root = new JSONObject(jsonResponse);
+            root = root.getJSONObject("users");
             JSONArray events = root.getJSONArray("recordset");
 
             for(int i = 0; events.getJSONObject(i) != null; i++) {
                 JSONObject event = events.getJSONObject(i);
 
-                JSONArray idJSON = event.getJSONArray("ID");
-                int id = idJSON.getInt(0);
-
-                int hostEventId = parseIdFromPrefix(event.getString("HostID"));
-
-                User host = new User(hostEventId, event.getString("Username"),
-                        event.getString("UserEmail"), event.getString("UserDOB"),
-                        event.getString("UserPhoneNumber"));
-                FundraisingEvent newEvent = new FundraisingEvent(id, event.getString("EventName"),
+                FundraisingEvent newEvent = new FundraisingEvent(event.getInt("ID"), event.getString("EventName"),
                         event.getString("EventDescription"),event.getString("EventDate"),false,
                         event.getInt("EventGoal"), event.getInt("CurrentMoney"));
+
+                JSONObject hostJSON = event.getJSONObject("HostID");
+                User host = new User(hostJSON.getInt("ID"), hostJSON.getString("Username"),
+                        hostJSON.getString("UserEmail"), hostJSON.getString("UserDOB"),
+                        hostJSON.getString("UserPhoneNumber"));
+                
                 newEvent.set_owner(host);
                 eventList.add(newEvent);
 
