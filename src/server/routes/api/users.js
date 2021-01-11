@@ -18,6 +18,8 @@ const conn = new sql.ConnectionPool({
     port: 8883
 });
 
+const util = require('util');
+
 // connect to database
 conn.connect().then(() => {
     console.log('Connected!');
@@ -48,20 +50,75 @@ router.get('/getuser', function (req, res) {
             queryString += `AND ${key} = '${req.query[key]}'`;
     }
 
-    conn.query(queryString)
-        .then(result => {
-            res.send({
-                'title': 'The queried user',
-                'result': result
-            });
-        }).catch(err => {
-            // ... error checks
-            if (err) {
-                console.error('Error !!!');
-                throw err
-            }
-        });
+
+    var jsonResult = { 'title': 'The queried events' };
+
+    (async () => {
+        jsonResult.result = await query(queryString);
+        res.send(jsonResult);
+    })()
 });
+
+async function query(queryString) {
+    try {
+        return await conn.query(queryString)
+    } finally {
+
+    }
+}
+
+router.post('/follow',(req,res)=>{
+    const userId = req.query.UserID;
+    const eventId = req.query.EventID;
+
+    var queryString = "INSERT INTO Follow (UserID,EventID) ";
+
+    queryString += `VALUES ('${userId}','${eventId}');`
+    console.log(queryString)
+
+    var transaction = new sql.Transaction(conn);
+    transaction.begin().then(function () {
+        conn.query(queryString)
+            .then(function () {
+                transaction.commit().then(function (recordSet) {
+                    conn.close();
+                    return res.send('Inserted successfully');
+                }).catch(function (err) {
+                    console.log("Error in Transaction Commit " + err);
+                    conn.close();
+                    return res.send('Error')
+                });
+            });
+    });
+})
+
+
+router.delete('/follow', jsonParser, (req, res) => {
+    const userId = req.query.UserID;
+    const eventId = req.query.EventID;
+
+    var queryString = "DELETE From Follow ";
+
+    queryString += " WHERE UserID = '" + userId + "' AND EventID = '" + eventId + "';"
+    console.log(queryString)
+
+    var transaction = new sql.Transaction(conn);
+    transaction.begin().then(function () {
+        conn.query(queryString)
+            .then(function () {
+                transaction.commit().then(function (recordSet) {
+                    console.log(recordSet);
+                    conn.close();
+                    return res.send('Delete successfully');
+                }).catch(function (err) {
+                    console.log("Error in Transaction Commit " + err);
+                    conn.close();
+                    return res.send('Error')
+                });
+            });
+    });
+});
+
 
 //get followed event
 router.get('/getfollowevents/:userId', function (req, res) {
@@ -72,37 +129,21 @@ router.get('/getfollowevents/:userId', function (req, res) {
     WHERE Follow.UserID = '${userId}';`
 
     var jsonResult = { 'title': 'The queried events' };
-
-    conn.query(queryString)
-        .then(result => {
-            jsonResult.users = result;
-
-            var j = 0;
-            for (i in Object.entries(jsonResult.users.recordset)) {
-                var hostQuery = `Select * from UserAccount Where IDandPrefix = '${jsonResult.users.recordset[j].HostID}'`
-                conn.query(hostQuery)
-                    .then(result => {
-                        jsonResult.users.recordset[j].HostID = result.recordset[0];
-                        j++;
-                        if (j == jsonResult.users.recordset.length) {
-                            res.send(jsonResult);
-                        }
-                    }).catch(err => {
-                        // ... error checks
-                        if (err) {
-                            console.error('Error !!!');
-                            throw err
-                        }
-                    });
-
+    (async () => {
+        jsonResult.result = await query(queryString);
+        var j = 0;
+        (async () => {
+            for (;;) {
+                if (j==jsonResult.result.recordset.length)
+                    break;
+                var hostQuery = `Select * from UserAccount Where IDandPrefix = '${jsonResult.result.recordset[j].HostID}'`;
+                var hostReturn = await query(hostQuery);
+                jsonResult.result.recordset[j].HostID = hostReturn.recordset[0];
+                j++;
             }
-        }).catch(err => {
-            // ... error checks
-            if (err) {
-                console.error('Error !!!');
-                throw err
-            }
-        });
+            res.send(jsonResult);
+        })()
+    })()
 });
 
 
