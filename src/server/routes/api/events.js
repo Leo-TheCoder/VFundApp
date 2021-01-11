@@ -1,7 +1,7 @@
 const express = require('express');
 var serviceAccount = require("../../server-key.json");
 const sql = require("mssql/msnodesqlv8");
-
+const util = require('util');
 var jsonParser = express.json();
 
 var router = express.Router();
@@ -34,6 +34,14 @@ router.get('/', function (req, res) {
     res.render('index', { title: 'Express' });
 });
 
+async function query(queryString) {
+    try {
+        return await conn.query(queryString)
+    } finally {
+
+    }
+}
+
 //query table UserAccount
 router.get('/getevent', function (req, res) {
     var queryString = `select * from Event`;
@@ -49,39 +57,22 @@ router.get('/getevent', function (req, res) {
             queryString += `AND ${key} = '${req.query[key]}'`;
     }
     //queryString += ` LEFT JOIN UserAccount ON UserAccount.IDandPrefix = Event.HostID`;
-
     var jsonResult = { 'title': 'The queried events' };
-
-    conn.query(queryString)
-        .then(result => {
-            jsonResult.users = result;
-
-            var j = 0;
-            for (i in Object.entries(jsonResult.users.recordset)) {
-                var hostQuery = `Select * from UserAccount Where IDandPrefix = '${jsonResult.users.recordset[j].HostID}'`
-                conn.query(hostQuery)
-                    .then(result => {
-                        jsonResult.users.recordset[j].HostID = result.recordset[0];
-                        j++;
-                        if (j == jsonResult.users.recordset.length){
-                            res.send(jsonResult);
-                        }
-                    }).catch(err => {
-                        // ... error checks
-                        if (err) {
-                            console.error('Error !!!');
-                            throw err
-                        }
-                    });
-                
-            } 
-        }).catch(err => {
-            // ... error checks
-            if (err) {
-                console.error('Error !!!');
-                throw err
+    (async () => {
+        jsonResult.result = await query(queryString);
+        var j = 0;
+        (async () => {
+            for (;;) {
+                if (j==jsonResult.result.recordset.length)
+                    break;
+                var hostQuery = `Select * from UserAccount Where IDandPrefix = '${jsonResult.result.recordset[j].HostID}'`;
+                var hostReturn = await query(hostQuery);
+                jsonResult.result.recordset[j].HostID = hostReturn.recordset[0];
+                j++;
             }
-        });
+            res.send(jsonResult);
+        })()
+    })()
 });
 
 router.get('/getfollowusers/:eventId', function (req, res) {
