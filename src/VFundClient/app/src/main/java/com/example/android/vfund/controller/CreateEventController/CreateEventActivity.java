@@ -1,9 +1,12 @@
-package com.example.android.vfund;
+package com.example.android.vfund.controller.CreateEventController;
 
 import android.os.Bundle;
 
+import com.example.android.vfund.R;
+import com.example.android.vfund.model.FundraisingEvent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -20,6 +23,10 @@ import java.util.Arrays;
 public class CreateEventActivity extends AppCompatActivity {
 
     LinearLayout firstPage, secondPage, lastPage;
+    TextInputLayout txtEventName, txtEventStory, txtEventMoneyAmount, txtUserName, txtCardNumber;
+    TextInputLayout txtAddress, txtPhone;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +34,14 @@ public class CreateEventActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.topAppBar);
         setSupportActionBar(toolbar);
 
+        FundraisingEvent event = new FundraisingEvent();
+        txtEventName = findViewById(R.id.txtEventName);
+        txtEventStory = findViewById(R.id.txtEventStory);
+        txtEventMoneyAmount = findViewById(R.id.txtEventMoneyAmount);
+        txtUserName = findViewById(R.id.txtUserName);
+        txtCardNumber = findViewById(R.id.txtCardNumber);
+        txtAddress = findViewById(R.id.txtAddress);
+        txtPhone = findViewById(R.id.txtPhone);
         firstPage = findViewById(R.id.firstPage);
         secondPage = findViewById(R.id.secondPage);
         lastPage = findViewById(R.id.lastPage);

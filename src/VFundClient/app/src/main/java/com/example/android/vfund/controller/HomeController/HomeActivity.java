@@ -19,7 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.vfund.CreateEventActivity;
+import com.example.android.vfund.controller.CreateEventController.CreateEventActivity;
 import com.example.android.vfund.R;
 import com.example.android.vfund.controller.HomeController.Adapter.EventAdapter;
 import com.example.android.vfund.controller.HomeController.Adapter.EventBriefAdapter;
