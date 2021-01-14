@@ -27,4 +27,5 @@
     <string name="phoneNumber">Số điện thoại</string>
     <string name="bankmenu">Chọn ngân hàng</string>
     <string name="complete">Hoàn tất</string>
+    <string name="inputDate">Chọn ngày kết thúc chiến dịch</string>
 </resources>
