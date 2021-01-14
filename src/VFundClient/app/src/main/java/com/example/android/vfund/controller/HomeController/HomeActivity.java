@@ -50,6 +50,8 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
     int[] customImagesTabSelected = {R.drawable.home_icon_selected, R.drawable.follow_icon_selected,
             R.drawable.explore_icon_selected, R.drawable.notify_icon_selected, R.drawable.account_icon_selected};
     public static final int REQUEST_DONATED_CODE = 1;
+    public static final int REQUEST_FOLLOW_CODE = 2;
+
     private final int ID_FETCH_EVENT_LOADER = 1;
 
     private HomeViewPagerAdapter homeViewPagerAdapter;
@@ -118,11 +120,16 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
         try {
             super.onActivityResult(requestCode, resultCode, data);
             if(requestCode == REQUEST_DONATED_CODE && resultCode == RESULT_OK) {
-                Log.e("LOGTAG", "TESTING");
                 Bundle bundle = data.getExtras();
                 FundraisingEvent event = bundle.getParcelable("event");
-                Log.e("LOGTAG", "" + event.getStringPercentage());
+                boolean isFollow = bundle.getBoolean("follow");
                 updateEvent(event);
+                if(isFollow) {
+                    followEvent(event);
+                }
+                else {
+                    unfollowEvent(event);
+                }
             }
         } catch (Exception e) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();

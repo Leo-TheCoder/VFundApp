@@ -8,6 +8,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -32,13 +33,16 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
     Button btnDonate;
     ImageButton btnBack;
     TextView txtEventName;
+    TextView txtNameOwner;
     TextView txtProgress;
     TextView txtGoalMoney;
     TextView txtDayLeft;
     ProgressBar progressBar;
+    ImageButton btnFollow;
 
     CharSequence[] customTextTab = {"Nội dung", "Đóng góp"};
     public static final int REQUEST_DONATE_CODE = 1;
+    public static final int REQUEST_FOLLOW_CODE = 2;
 
     private EventDetailAdapter eventDetailPagerAdapter;
     private int numOfTabs = 2;
@@ -46,6 +50,8 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
     private FundraisingEvent mEvent;
     private DonateAdapter myDonateAdapter;
     private Intent getToDonateActivity;
+    private boolean isFollowed;
+    private Bundle mBundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +61,9 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
         Intent callingIntent = getIntent();
         Bundle eventBundle = callingIntent.getExtras();
         mEvent = eventBundle.getParcelable("event");
+        isFollowed = mEvent.is_Followed();
+
+        mBundle = new Bundle();
 
         viewPager = (ViewPager2)findViewById(R.id.viewpager_detail);
         btnDonate = (Button)findViewById(R.id.btnDonate_Detail);
@@ -63,6 +72,8 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
         btnBack.setOnClickListener(this);
         txtEventName = (TextView)findViewById(R.id.txtEventName_Detail);
         txtEventName.setText(mEvent.get_eventName());
+        txtNameOwner = (TextView)findViewById(R.id.txtNameOwner_Detail);
+        txtNameOwner.setText(mEvent.get_owner().get_name());
         txtProgress = (TextView)findViewById(R.id.txtProgressEvent_Detail);
         txtProgress.setText(mEvent.getStringPercentage());
         txtGoalMoney = (TextView)findViewById(R.id.txtMoneyGoalEvent_Detail);
@@ -72,7 +83,16 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
         progressBar = (ProgressBar)findViewById(R.id.progressEvent_Detail);
         progressBar.setMax(Math.round(mEvent.get_eventGoal()));
         progressBar.setProgress(Math.round(mEvent.get_currentGain()));
-
+        btnFollow = (ImageButton)findViewById(R.id.btnFollowEvent_Detail);
+        btnFollow.setOnClickListener(this);
+        if(isFollowed) {
+            btnFollow.setImageResource(R.drawable.follow_icon_detail_selected);
+        }
+        else {
+            //Default button in xml
+        }
+        mBundle.putBoolean("follow", isFollowed);
+        mBundle.putParcelable("event", mEvent);
 
         eventDetailPagerAdapter = new EventDetailAdapter(this);
 
@@ -88,8 +108,6 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
         viewPager.setOffscreenPageLimit(2);
 
        setUpTabLayout();
-
-
     }
 
     private void setUpTabLayout() {
@@ -141,6 +159,21 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
         else if(v.getId() == btnBack.getId()){
             finish();
         }
+        else if(v.getId() == btnFollow.getId()) {
+            isFollowed = !isFollowed;
+            Log.e("TEST", "onClick: "+ isFollowed);
+            mEvent.set_isFollowed(isFollowed);
+            if(isFollowed) {
+                btnFollow.setImageResource(R.drawable.follow_icon_detail_selected);
+            }
+            else {
+                btnFollow.setImageResource(R.drawable.follow_icon_detail);
+            }
+            mBundle.putBoolean("follow", isFollowed);
+            Intent intent = getIntent();
+            intent.putExtras(mBundle);
+            setResult(RESULT_OK, intent);
+        }
     }
 
     @Override
@@ -153,8 +186,9 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
                 mEvent = bundle.getParcelable("event");
                 txtProgress.setText(mEvent.getStringPercentage());
                 progressBar.setProgress(Math.round(mEvent.get_currentGain()));
+                mBundle.putParcelable("event", mEvent);
                 Intent intent = getIntent();
-                intent.putExtras(bundle);
+                intent.putExtras(mBundle);
                 setResult(RESULT_OK, intent);
             }
         } catch (Exception e) {
