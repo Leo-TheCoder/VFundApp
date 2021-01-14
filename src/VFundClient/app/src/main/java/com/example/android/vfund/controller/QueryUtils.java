@@ -381,4 +381,63 @@ public final class QueryUtils {
         }
         return true;
     }
+
+    /**
+     * Make an HTTP request to the given URL and update event with current money
+     */
+    public static boolean makeHttpRequestCreateEvent(URL url, FundraisingEvent event) throws IOException {
+        String jsonResponse = "";
+
+        // If the URL is null, then return early.
+        if (url == null) {
+            return false;
+        }
+
+        HttpURLConnection urlConnection = null;
+        InputStream inputStream = null;
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setReadTimeout(10000 /* milliseconds */);
+            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+            urlConnection.setRequestProperty("Accept","application/json");
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.connect();
+
+            JSONObject jsonParam = new JSONObject();
+            jsonParam.put("CurrentMoney", event.get_eventGoal());
+            jsonParam.put("EventName", event.get_eventName());
+            jsonParam.put("EventDescription", event.get_eventDescription());
+
+            Log.i("JSON", jsonParam.toString());
+            DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
+            os.writeBytes(jsonParam.toString());
+
+            os.flush();
+            os.close();
+
+            Log.i("MSG" , urlConnection.getResponseMessage());
+            // If the request was successful (response code 200),
+            // then read the input stream and parse the response.
+            if (urlConnection.getResponseCode() == 200) {
+                Log.e(LOG_TAG, "Successfully request");
+            } else {
+                Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Problem retrieving the user JSON results.", e);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        }
+        return true;
+    }
 }

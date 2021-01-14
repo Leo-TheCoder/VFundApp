@@ -4,14 +4,15 @@ import android.app.DatePickerDialog;
 import android.os.Bundle;
 
 import com.example.android.vfund.R;
+import com.example.android.vfund.controller.QueryUtils;
 import com.example.android.vfund.model.FundraisingEvent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.loader.content.AsyncTaskLoader;
 
 import android.text.InputType;
 import android.view.View;
@@ -20,19 +21,23 @@ import android.widget.AutoCompleteTextView;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CreateEventActivity extends AppCompatActivity {
 
+    private FundraisingEvent mEvent;
+    private static final String EVENT_CREATE_REQUEST_URL = "http://10.0.2.2:8080/api/events/createevent";
 
-    LinearLayout firstPage, secondPage, lastPage;
-    TextInputLayout txtEventName, txtEventStory, txtEventMoneyAmount, txtUserName, txtCardNumber;
-    TextInputLayout txtAddress, txtPhone;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,17 +96,6 @@ public class CreateEventActivity extends AppCompatActivity {
             }
         });
 
-        FundraisingEvent event = new FundraisingEvent();
-        txtEventName = findViewById(R.id.txtEventName);
-        txtEventStory = findViewById(R.id.txtEventStory);
-        txtEventMoneyAmount = findViewById(R.id.txtEventMoneyAmount);
-        txtUserName = findViewById(R.id.txtUserName);
-        txtCardNumber = findViewById(R.id.txtCardNumber);
-        txtAddress = findViewById(R.id.txtAddress);
-        txtPhone = findViewById(R.id.txtPhone);
-        firstPage = findViewById(R.id.firstPage);
-        secondPage = findViewById(R.id.secondPage);
-        lastPage = findViewById(R.id.lastPage);
 
         ArrayList<String> categories = new ArrayList<String> (Arrays.asList("Sức khỏe", "Âm nhạc", "Giáo dục", "Thể thao"));
         ArrayAdapter categoryAdapter = new ArrayAdapter(getBaseContext(), R.layout.list_item, categories);
@@ -153,6 +147,13 @@ public class CreateEventActivity extends AppCompatActivity {
 
                 contents = firstPage.findViewById(R.id.txtDate);
                 eventDate = contents.getText().toString();
+                String deadline = eventDate;
+                try {
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                     deadline = FundraisingEvent.inputFormat.format(simpleDateFormat.parse(eventDate));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
                 contents = firstPage.findViewById(R.id.autoComplete);
                 eventCategory = contents.getText().toString();
@@ -174,10 +175,31 @@ public class CreateEventActivity extends AppCompatActivity {
                 contents = secondPage.findViewById(R.id.autoComplete);
                 bank = contents.getText().toString();
 
+                if(eventName.length() < 1 || eventStory.length() < 1 || eventMoney.length() < 1 ||
+                        eventCategory.length() < 1 || eventDate.length() < 1 || name.length() < 1 ||
+                        cardNumber.length() < 1 || address.length() < 1 || phone.length() < 1 || bank.length() < 1) {
+                    Toast.makeText(getBaseContext(), "All infomation must be filled!", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    mEvent = new FundraisingEvent(-1,eventName,eventStory, deadline,
+                            true, Float.parseFloat(eventMoney), 0 );
+
+
+                }
+
                 finish();
             }
         });
+    }
 
-
+    public void makeHttpRequestCreate() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                StringBuilder requestUrl = new StringBuilder(EVENT_CREATE_REQUEST_URL);
+                URL url = QueryUtils.createUrl("");
+            }
+        });
     }
 }
