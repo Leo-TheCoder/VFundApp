@@ -128,7 +128,9 @@ router.post('/createevent',jsonParser ,(req, res) => {
             .then(function () {
                 transaction.commit().then(function (recordSet) {
                     console.log(recordSet);
-                    return res.send('Inserted successfully');
+                    (async () => {
+                        res.send(await query(`SELECT IDENT_CURRENT('Event')`));
+                    })()
                 }).catch(function (err) {
                     console.log("Error in Transaction Commit " + err);
                     conn.close();
