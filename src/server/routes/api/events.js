@@ -107,12 +107,12 @@ router.post('/createevent',jsonParser ,(req, res) => {
     for (const [key, value] of Object.entries(req.body)) {
         if (!second) {
             cols += `${key}`;
-            values += `'${value}'`;
+            values += `N'${value}'`;
             second = true;
         }
         else {
             cols += `,${key}`;
-            values += `,'${value}'`;
+            values += `,N'${value}'`;
         }
 
     }
