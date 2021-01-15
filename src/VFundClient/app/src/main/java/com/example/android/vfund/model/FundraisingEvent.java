@@ -93,6 +93,8 @@ public class FundraisingEvent implements Parcelable {
         _isFollowed = isFollowed;
     }
 
+    public void set_eventID(int eventID) { _eventID = eventID; }
+
     public void getDonate(float money) {
         _currentGain += money;
     }
