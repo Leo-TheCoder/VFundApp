@@ -97,7 +97,7 @@ router.get('/getfollowusers/:eventId', function (req, res) {
         });
 });
 
-router.post('/createevent', (req, res) => {
+router.post('/createevent',jsonParser ,(req, res) => {
     var queryString = "INSERT INTO Event ";
     var cols, values;
     cols = "(";
@@ -107,19 +107,19 @@ router.post('/createevent', (req, res) => {
     for (const [key, value] of Object.entries(req.body)) {
         if (!second) {
             cols += `${key}`;
-            values += `${value}`;
+            values += `'${value}'`;
             second = true;
         }
         else {
             cols += `,${key}`;
-            values += `,${value}`;
+            values += `,'${value}'`;
         }
 
     }
     cols += ')';
     values += ')';
 
-    queryString += cols + " VALUES " + values;
+    queryString += cols + " VALUES " + values+';';
     console.log(queryString)
 
     var transaction = new sql.Transaction(conn);
