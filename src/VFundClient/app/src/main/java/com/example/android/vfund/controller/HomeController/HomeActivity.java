@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class HomeActivity extends AppCompatActivity implements EventCallBack, LoaderManager.LoaderCallbacks<ArrayList<ArrayList<FundraisingEvent>>> {
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener, EventCallBack, LoaderManager.LoaderCallbacks<ArrayList<ArrayList<FundraisingEvent>>> {
 
     ViewPager2 viewPager;
     TextView txtAddEvent;
@@ -50,7 +50,7 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
     int[] customImagesTabSelected = {R.drawable.home_icon_selected, R.drawable.follow_icon_selected,
             R.drawable.explore_icon_selected, R.drawable.notify_icon_selected, R.drawable.account_icon_selected};
     public static final int REQUEST_DONATED_CODE = 1;
-    public static final int REQUEST_FOLLOW_CODE = 2;
+    public static final int REQUEST_CREATE_CODE = 2;
 
     private final int ID_FETCH_EVENT_LOADER = 1;
 
@@ -78,13 +78,7 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
         txtAddEvent = (TextView)findViewById(R.id.txtAddEvent);
         viewPager = (ViewPager2)findViewById(R.id.viewpager);
         progressHome = (ProgressBar)findViewById(R.id.progressHome);
-        txtAddEvent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent getToAddEvent = new Intent(getApplicationContext(), CreateEventActivity.class);
-                startActivity(getToAddEvent);
-            }
-        });
+        txtAddEvent.setOnClickListener(this);
 
         homeViewPagerAdapter = new HomeViewPagerAdapter(this);
 
@@ -131,6 +125,10 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
                     unfollowEvent(event);
                 }
             }
+            else if(requestCode == REQUEST_CREATE_CODE && resultCode == RESULT_OK) {
+                FundraisingEvent newEvent = data.getExtras().getParcelable("event");
+                createEvent(newEvent);
+            }
         } catch (Exception e) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
         }
@@ -174,6 +172,13 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
                 }
             }
         });
+    }
+
+    @Override
+    public void createEvent(FundraisingEvent event) {
+        Log.e("TEST", "createEvent: event id = "+event.get_eventID());
+        followEvent(event);
+        myEventAdapter.addEvent(event);
     }
 
     @Override
@@ -225,6 +230,17 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
         });
     }
 
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == txtAddEvent.getId()) {
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("user", mLoginUser);
+            Intent getToAddEvent = new Intent(this, CreateEventActivity.class);
+            getToAddEvent.putExtras(bundle);
+            startActivityForResult(getToAddEvent, REQUEST_CREATE_CODE);
+        }
+    }
+
     @NonNull
     @Override
     public Loader<ArrayList<ArrayList<FundraisingEvent>>> onCreateLoader(int id, @Nullable Bundle args) {
@@ -245,6 +261,8 @@ public class HomeActivity extends AppCompatActivity implements EventCallBack, Lo
         myEventAdapter.submitList(null);
         myEventFollowedAdapter.submitList(null);
     }
+
+
 
     private static class EventAsyncTaskLoader extends AsyncTaskLoader<ArrayList<ArrayList<FundraisingEvent>>>{
         private String mUrlAll = null;

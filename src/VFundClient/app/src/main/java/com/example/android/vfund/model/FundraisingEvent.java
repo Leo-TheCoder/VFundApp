@@ -17,9 +17,10 @@ public class FundraisingEvent implements Parcelable {
     private float _eventRate;
     private boolean _isFollowed;
     private float _currentGain;
+    private String _deadline;
     private User _owner = null;
 
-    private static SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    public static SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     public FundraisingEvent(){}
 
     public FundraisingEvent(int id, String name, String description,
@@ -28,6 +29,7 @@ public class FundraisingEvent implements Parcelable {
         _eventName = name;
         _eventDescription = description;
         Date dateDeadline = null;
+        _deadline = deadline;
         try {
             dateDeadline = inputFormat.parse(deadline);
             Date now = new Date();
@@ -69,7 +71,11 @@ public class FundraisingEvent implements Parcelable {
         return _eventID;
     }
 
-    public int timeRemain() { return 1;}
+    /**
+     * Get the string format of deadline
+     * @return deadline with "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'" format
+     */
+    public String get_deadlineFormatted() { return _deadline;}
 
     public String get_eventName() {
         return _eventName;
@@ -86,6 +92,8 @@ public class FundraisingEvent implements Parcelable {
     public void set_isFollowed(boolean isFollowed) {
         _isFollowed = isFollowed;
     }
+
+    public void set_eventID(int eventID) { _eventID = eventID; }
 
     public void getDonate(float money) {
         _currentGain += money;

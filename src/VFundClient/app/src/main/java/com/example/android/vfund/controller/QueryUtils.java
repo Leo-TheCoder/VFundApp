@@ -381,4 +381,99 @@ public final class QueryUtils {
         }
         return true;
     }
+
+    /**
+     * Make an HTTP request to the given URL and update event with current money
+     */
+    public static String makeHttpRequestCreateEvent(URL url, FundraisingEvent event) throws IOException {
+        String jsonResponse = "";
+
+        // If the URL is null, then return early.
+        if (url == null) {
+            return null;
+        }
+
+        HttpURLConnection urlConnection = null;
+        InputStream inputStream = null;
+        try {
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setReadTimeout(10000 /* milliseconds */);
+            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+            urlConnection.setRequestProperty("Accept","application/json");
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.connect();
+
+            JSONObject jsonParam = new JSONObject();
+            jsonParam.put("StringPrefix", "E");
+            jsonParam.put("EventGoal", event.get_eventGoal());
+            jsonParam.put("EventName", event.get_eventName());
+            jsonParam.put("EventDescription", event.get_eventDescription());
+            jsonParam.put("EventDate", event.get_deadlineFormatted());
+            jsonParam.put("CurrentMoney",0);
+            jsonParam.put("EventRate", 0);
+            jsonParam.put("isEnd", 0);
+            jsonParam.put("HostID", "US" +event.get_owner().get_id());
+
+            Log.i("JSON", jsonParam.toString());
+            DataOutputStream os = new DataOutputStream(urlConnection.getOutputStream());
+            os.writeBytes(jsonParam.toString());
+
+            os.flush();
+            os.close();
+
+            Log.i("MSG" , urlConnection.getResponseMessage());
+            // If the request was successful (response code 200),
+            // then read the input stream and parse the response.
+            if (urlConnection.getResponseCode() == 200) {
+                Log.e(LOG_TAG, "Successfully request");
+                inputStream = urlConnection.getInputStream();
+                jsonResponse = readFromStream(inputStream);
+            } else {
+                Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Problem retrieving the user JSON results.", e);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        }
+        return jsonResponse;
+    }
+
+    private static int extractIdNewestEvent(String jsonResponse) {
+        int id = 0;
+        try {
+            JSONObject root = new JSONObject(jsonResponse);
+            JSONArray featuresArray = root.getJSONArray("recordset");
+            JSONObject properties = featuresArray.getJSONObject(0);
+            id = properties.getInt("");
+
+        } catch (JSONException e) {
+            Log.e("QueryUtils", "Problem parsing the ID JSON results");
+            id = 0;
+        }
+        return id;
+    }
+
+    public static FundraisingEvent createEventToServer(String url, FundraisingEvent event) {
+        URL urlRequest = createUrl(url);
+        try {
+            String jsonResponse = makeHttpRequestCreateEvent(urlRequest, event);
+            int id = extractIdNewestEvent(jsonResponse);
+            Log.e("TEST", "createEventToServer: id = "+ id );
+            event.set_eventID(id);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return event;
+    }
 }
