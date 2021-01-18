@@ -141,6 +141,9 @@ public class FundraisingEvent implements Parcelable {
     public String getStringPercentage() {
         float percentage = _currentGain/ _eventGoal * 100;
         String result = String.valueOf(Math.round(percentage)) +"%";
+        if(percentage > 100) {
+            result = "100%";
+        }
         return result;
     }
 

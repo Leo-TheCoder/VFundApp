@@ -48,7 +48,7 @@
             android:id="@+id/txtNameOwner_Notify"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Em Gái Mưa đã quyên góp"
+            android:text="Minh Lâm đã quyên góp"
             android:textSize="15sp"
             android:textColor="@android:color/white"/>
 

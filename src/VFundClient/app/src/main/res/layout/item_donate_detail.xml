@@ -38,7 +38,7 @@
             android:id="@+id/txtNameDonor_Donate_Detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Em Gái Mưa"
+            android:text="Người bí ẩn"
             android:textAllCaps="true"
             android:textColor="@color/colorPrimaryLightGreen"
             android:textSize="15sp"
