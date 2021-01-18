@@ -41,6 +41,8 @@ public class DonateActivity extends AppCompatActivity implements View.OnClickLis
     private FundraisingEvent mEvent;
     private Button btnDonate;
     private TextInputLayout txtMoney;
+    private AutoCompleteTextView txtPaymentMethod;
+    private TextInputLayout txtCardNumber;
 
     private static final String DONATE_REQUEST = "http://10.0.2.2:8080/api/events/patchevent/";
     @Override
@@ -55,6 +57,8 @@ public class DonateActivity extends AppCompatActivity implements View.OnClickLis
         btnDonate = (Button)findViewById(R.id.btnDonate_Donate);
         btnDonate.setOnClickListener(this);
         txtMoney = (TextInputLayout)findViewById(R.id.txtMoneyField_Donate);
+        txtPaymentMethod = (AutoCompleteTextView)findViewById(R.id.autoComplete) ;
+        txtCardNumber = (TextInputLayout)findViewById(R.id.textField);
 
         ArrayList<String> items = new ArrayList<String> (Arrays.asList("Thẻ ngân hàng", "Visa/Mastercard", "Momo", "ZaloPay"));
         ArrayAdapter adapter = new ArrayAdapter(getBaseContext(), R.layout.list_item, items);
@@ -82,49 +86,69 @@ public class DonateActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         if(v.getId() == btnDonate.getId()) {
-            float moneyDonate = Float.parseFloat(txtMoney.getEditText().getText().toString());
-            mEvent.getDonate(moneyDonate);
-            Intent intent = getIntent();
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("event", mEvent);
-            intent.putExtras(bundle);
-            setResult(RESULT_OK, intent);
-
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            Handler donateHandler = new Handler(Looper.getMainLooper());
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    boolean isRequest = false;
-                    StringBuilder request = new StringBuilder();
-                    request.append(DONATE_REQUEST).append("E").append(mEvent.get_eventID());
-                    URL requestUrl = QueryUtils.createUrl(request.toString());
-                    try {
-                        isRequest = QueryUtils.makeHttpRequestUpdateEvent(requestUrl, (int)mEvent.get_currentGain());
-                    } catch (IOException e) {
-                        Log.e("LOZ", "LOZ");
-                        e.printStackTrace();
-                    }
-                    if(isRequest) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(), "Donate Successfully", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                    else {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(), "Donate Failed", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+            String moneyAmountStr = txtMoney.getEditText().getText().toString();
+            if(moneyAmountStr.length() < 1) {
+                Toast.makeText(getApplicationContext(),"Số tiền quyên góp không hợp lệ", Toast.LENGTH_SHORT).show();
+            }
+            else if(txtCardNumber.getEditText().getText().toString().length() < 1){
+                Toast.makeText(getApplicationContext(),"Phương thức quyên góp không hợp lệ", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                float moneyDonate = Float.parseFloat(txtMoney.getEditText().getText().toString());
+                if(moneyDonate <= 0) {
+                    Toast.makeText(getApplicationContext(), "Số tiền quyên góp không hợp lệ", Toast.LENGTH_SHORT).show();
                 }
-            });
-            Toast.makeText(this, "Donate Successfully", Toast.LENGTH_SHORT).show();
-            finish();
+                else if(txtPaymentMethod.getText().toString().length() < 1){
+                    Toast.makeText(getApplicationContext(), "Cần chọn phương thức chuyển tiền ", Toast.LENGTH_SHORT).show();
+                }
+                else {
+
+                    mEvent.getDonate(moneyDonate);
+                    Intent intent = getIntent();
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("event", mEvent);
+                    intent.putExtras(bundle);
+                    setResult(RESULT_OK, intent);
+
+                    ExecutorService executorService = Executors.newSingleThreadExecutor();
+                    Handler donateHandler = new Handler(Looper.getMainLooper());
+                    executorService.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            boolean isRequest = false;
+                            StringBuilder request = new StringBuilder();
+                            request.append(DONATE_REQUEST).append("E").append(mEvent.get_eventID());
+                            URL requestUrl = QueryUtils.createUrl(request.toString());
+                            try {
+                                isRequest = QueryUtils.makeHttpRequestUpdateEvent(requestUrl, (int)mEvent.get_currentGain());
+                            } catch (IOException e) {
+                                Log.e("LOZ", "LOZ");
+                                e.printStackTrace();
+                            }
+                            if(isRequest) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getApplicationContext(), "Donate Successfully", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                });
+                            }
+                            else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getApplicationContext(), "Donate Failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+
+
+
         }
 
     }

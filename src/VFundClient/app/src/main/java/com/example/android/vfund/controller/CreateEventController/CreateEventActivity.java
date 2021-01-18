@@ -30,11 +30,13 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 public class CreateEventActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<FundraisingEvent> {
 
@@ -164,9 +166,13 @@ public class CreateEventActivity extends AppCompatActivity implements LoaderMana
                 contents = firstPage.findViewById(R.id.txtDate);
                 eventDate = contents.getText().toString();
                 String deadline = eventDate;
+                int timeRemain = 0;
                 try {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                     deadline = FundraisingEvent.inputFormat.format(simpleDateFormat.parse(eventDate));
+                    deadline = FundraisingEvent.inputFormat.format(simpleDateFormat.parse(eventDate));
+                    Date now = new Date();
+                    long diff = simpleDateFormat.parse(eventDate).getTime() - now.getTime();
+                    timeRemain = (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -198,7 +204,12 @@ public class CreateEventActivity extends AppCompatActivity implements LoaderMana
                         eventDate.length() < 1 || name.length() < 1 || eventCategory.length() < 1 ||
                         cardNumber.length() < 1 || address.length() < 1 || phone.length() < 1 || bank.length() < 1) {
                     Toast.makeText(getBaseContext(), "Cần phải điền mọi thông tin!", Toast.LENGTH_SHORT).show();
-                    Log.e("TEST", "GET HERE!x1");
+                }
+                else if(eventName.length() < 5) {
+                    Toast.makeText(getBaseContext(), "Tên sự kiện cần có ít nhất 5 kí tự", Toast.LENGTH_SHORT).show();
+                }
+                else if(timeRemain <= 0) {
+                    Toast.makeText(getBaseContext(), "Thời gian kết thúc sự kiện phải ở tương lai", Toast.LENGTH_SHORT).show();
                 }
                 else if(Float.parseFloat(eventMoney) < 100000) {
                     Toast.makeText(getBaseContext(), "Tiền cần quyên góp ít nhất 100,000đ",Toast.LENGTH_SHORT).show();

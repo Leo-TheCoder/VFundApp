@@ -39,6 +39,7 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
     TextView txtDayLeft;
     ProgressBar progressBar;
     ImageButton btnFollow;
+    TextView txtDayLeftLabel;
 
     CharSequence[] customTextTab = {"Nội dung", "Đóng góp"};
     public static final int REQUEST_DONATE_CODE = 1;
@@ -79,7 +80,7 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
         txtGoalMoney = (TextView)findViewById(R.id.txtMoneyGoalEvent_Detail);
         txtGoalMoney.setText(mEvent.getStringGoalFormat());
         txtDayLeft = (TextView)findViewById(R.id.txtDayLeft_Detail);
-        txtDayLeft.setText(String.valueOf(mEvent.get_timeRemain()));
+        txtDayLeftLabel = (TextView)findViewById(R.id.txtDayLeftLabel_Detail);
         progressBar = (ProgressBar)findViewById(R.id.progressEvent_Detail);
         progressBar.setMax(Math.round(mEvent.get_eventGoal()));
         progressBar.setProgress(Math.round(mEvent.get_currentGain()));
@@ -91,6 +92,17 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
         else {
             //Default button in xml
         }
+
+        if(mEvent.get_timeRemain() > 0) {
+            txtDayLeft.setText(String.valueOf(mEvent.get_timeRemain()));
+        }
+        else {
+            txtDayLeft.setText("HẾT HẠN");
+            txtDayLeft.setTextSize(25);
+            txtDayLeft.setTextColor(Color.RED);
+            txtDayLeftLabel.setVisibility(View.GONE);
+        }
+
         mBundle.putBoolean("follow", isFollowed);
         mBundle.putParcelable("event", mEvent);
 
@@ -150,11 +162,16 @@ public class EventDetailActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         if(v.getId() == btnDonate.getId()){
-            getToDonateActivity = new Intent(this, DonateActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putParcelable("event", mEvent);
-            getToDonateActivity.putExtras(bundle);
-            startActivityForResult(getToDonateActivity, REQUEST_DONATE_CODE);
+            if(mEvent.get_timeRemain() > 0) {
+                getToDonateActivity = new Intent(this, DonateActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("event", mEvent);
+                getToDonateActivity.putExtras(bundle);
+                startActivityForResult(getToDonateActivity, REQUEST_DONATE_CODE);
+            }
+            else {
+                Toast.makeText(this, "Sự kiện đã hết hạn hoạt động", Toast.LENGTH_SHORT).show();
+            }
         }
         else if(v.getId() == btnBack.getId()){
             finish();

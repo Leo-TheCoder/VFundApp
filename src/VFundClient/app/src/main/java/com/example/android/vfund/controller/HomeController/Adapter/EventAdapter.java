@@ -52,6 +52,7 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
         public TextView txtDayLeft;
         public ProgressBar progressEvent;
         public TextView txtNameOwner;
+        public TextView txtDayLeftLabel;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -64,7 +65,7 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
             progressEvent = (ProgressBar)itemView.findViewById(R.id.progressEvent);
             txtNameOwner = (TextView)itemView.findViewById(R.id.txtNameOwner);
             btnFollow = (MaterialButton)itemView.findViewById(R.id.btnFollowEvent);
-
+            txtDayLeftLabel=(TextView)itemView.findViewById(R.id.txtDayLeftLabel);
 
             if(isFollowed) {
                 btnFollow.setVisibility(View.GONE);
@@ -166,7 +167,18 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
         holder.txtDescriptionEvent.setText(description);
 
         holder.txtMoneyGoalEvent.setText(currentEvent.getStringGoalFormat());
-        holder.txtDayLeft.setText(String.valueOf(currentEvent.get_timeRemain()));
+        if(currentEvent.get_timeRemain() > 0) {
+            holder.txtDayLeft.setTextSize(30);
+            holder.txtDayLeftLabel.setVisibility(View.VISIBLE);
+            holder.txtDayLeft.setText(String.valueOf(currentEvent.get_timeRemain()));
+        }
+        else {
+            holder.txtDayLeft.setText("HẾT HẠN");
+            holder.txtDayLeft.setTextSize(25);
+            holder.txtDayLeft.setTextColor(Color.RED);
+            holder.txtDayLeftLabel.setVisibility(View.GONE);
+        }
+
         User owner = currentEvent.get_owner();
         if(owner != null) {
             holder.txtNameOwner.setText(owner.get_name());
