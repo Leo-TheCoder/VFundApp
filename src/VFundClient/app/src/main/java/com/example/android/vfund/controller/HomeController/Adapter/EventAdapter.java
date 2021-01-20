@@ -169,6 +169,7 @@ public class EventAdapter extends ListAdapter<FundraisingEvent, EventAdapter.Vie
         holder.txtMoneyGoalEvent.setText(currentEvent.getStringGoalFormat());
         if(currentEvent.get_timeRemain() > 0) {
             holder.txtDayLeft.setTextSize(30);
+            holder.txtDayLeft.setTextColor(Color.WHITE);
             holder.txtDayLeftLabel.setVisibility(View.VISIBLE);
             holder.txtDayLeft.setText(String.valueOf(currentEvent.get_timeRemain()));
         }
